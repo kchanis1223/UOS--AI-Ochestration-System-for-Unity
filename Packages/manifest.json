@@ -9,6 +9,6 @@
     "com.unity.modules.imgui": "1.0.0"
   },
   "testables": [
-    "com.lyx.unity-conv-mcp"
+    "com.lyx.oh-my-unity"
   ]
 }

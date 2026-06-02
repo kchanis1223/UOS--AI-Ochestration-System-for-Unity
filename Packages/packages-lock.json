@@ -1,7 +1,7 @@
 {
   "dependencies": {
-    "com.lyx.unity-conv-mcp": {
-      "version": "file:com.lyx.unity-conv-mcp",
+    "com.lyx.oh-my-unity": {
+      "version": "file:com.lyx.oh-my-unity",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
