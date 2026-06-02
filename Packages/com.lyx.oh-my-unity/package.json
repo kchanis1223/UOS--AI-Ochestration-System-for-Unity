@@ -1,0 +1,15 @@
+{
+  "name": "com.lyx.oh-my-unity",
+  "version": "0.1.0",
+  "displayName": "Oh My Unity (Unity Editor Bridge)",
+  "description": "Client-agnostic MCP server for Unity 6: serves planning materials as resources and generates/edits UI screens + screen transitions from a client LLM's PlanningIntent. The Editor hosts a localhost socket listener that the MCP stdio sidecar proxies to. Editor-only generation; pure C# package (sidecar shipped separately).",
+  "unity": "6000.0",
+  "keywords": ["mcp", "editor", "ui", "ugui", "ai", "codegen"],
+  "author": {
+    "name": "lyx"
+  },
+  "license": "MIT",
+  "testables": [
+    "Lyx.OhMyUnity.Tests.Editor"
+  ]
+}
