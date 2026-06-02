@@ -259,6 +259,8 @@ namespace Lyx.OhMyUnity.Editor
                     return ExecuteSceneHierarchy(tool, raw);
                 case "capture_preview":
                     return ExecuteCapturePreview(raw);
+                case "get_project_info":
+                    return ExecuteProjectInfo(tool);
                 default:
                     throw new NotSupportedException(
                         $"tool '{tool}' is not implemented in the v1 Editor backbone");
@@ -362,6 +364,26 @@ namespace Lyx.OhMyUnity.Editor
             string[] ids = Backend.ListScreens().ToArray();
             ToolCallLog.Record(tool, ToolCallStatus.Succeeded, $"{ids.Length} screen(s)");
             return JsonUtility.ToJson(new ScreenListData { screens = ids });
+        }
+
+        // Identity of the project this Editor has open. Application.dataPath is
+        // "<project>/Assets"; the project root is its parent. Lets the sidecar /
+        // uoc-context plugin write work context into "<projectRoot>/.uoc".
+        private static string ExecuteProjectInfo(string tool)
+        {
+            string dataPath = Application.dataPath;
+            System.IO.DirectoryInfo dir = System.IO.Directory.GetParent(dataPath);
+            string projectPath = dir != null ? dir.FullName : dataPath;
+            string projectName = dir != null ? dir.Name : Application.productName;
+
+            var data = new ProjectInfoData
+            {
+                projectPath = projectPath,
+                projectName = projectName,
+                unityVersion = Application.unityVersion,
+            };
+            ToolCallLog.Record(tool, ToolCallStatus.Succeeded, projectPath);
+            return JsonUtility.ToJson(data);
         }
 
         private static string ExecuteCapturePreview(string raw)
@@ -585,6 +607,7 @@ namespace Lyx.OhMyUnity.Editor
         [Serializable] private sealed class CreateScreenData { public string screenId; public ElementPairData[] elements; }
         [Serializable] private sealed class ElementIdData { public string elementId; }
         [Serializable] private sealed class ScreenListData { public string[] screens; }
+        [Serializable] private sealed class ProjectInfoData { public string projectPath; public string projectName; public string unityVersion; }
         [Serializable] private sealed class OkData { public bool ok; }
         [Serializable] private sealed class HierarchyNode { public string name; public string elementId; public HierarchyNode[] children; }
         [Serializable] private sealed class HierarchyData { public HierarchyNode[] roots; }

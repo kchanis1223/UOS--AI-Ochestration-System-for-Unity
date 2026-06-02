@@ -7,7 +7,8 @@
     "anthropic": {}
   },
   "plugin": [
-    "opencode-claude-auth@latest"
+    "opencode-claude-auth@latest",
+    "file://./.opencode/plugins/uos.ts"
   ],
   "permission": {
     "edit": "allow",

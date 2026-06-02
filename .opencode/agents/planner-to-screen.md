@@ -40,6 +40,11 @@ permission:
 - `list_screens` — 현재 씬의 모든 화면 목록.
 - `get_scene_hierarchy` — 화면 또는 전체 씬의 GameObject 트리.
 - `capture_preview` — 화면 썸네일 캡처 (PNG, 시각 검증용).
+- `get_project_info` — 연결된 Unity 프로젝트의 identity (`projectPath`/`projectName`/`unityVersion`). 사용자가 "지금 어느 프로젝트?"를 물을 때 또는 `<projectRoot>/.uos/` 위치를 확인할 때 사용.
+
+### 컨텍스트 영속 — `.uos/` (UOS, Unity Orchestration System)
+
+uos plugin (`.opencode/plugins/uos.ts`)이 mutating UI tool 호출마다 결과를 **연결된 Unity 프로젝트의 `<projectRoot>/.uos/`에 자동 기록**합니다 (`work-journal.jsonl`, `screens.json`, `project.json`). 이 디렉토리는 uos가 그 프로젝트를 인식하는 entry point이자 작업 컨텍스트 저장소 — 다음 세션에서도 이전 작업을 이어갈 수 있게 합니다. 당신은 이 plugin을 의식할 필요 없음 (자동), 다만 사용자가 "지금까지 만든 화면 어디 보면 돼?" 물으면 `<projectRoot>/.uos/screens.json`이라고 답할 수 있음.
 
 ## 표준 워크플로우 (PPTX → 화면 N개)
 
