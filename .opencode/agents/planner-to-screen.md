@@ -1,7 +1,7 @@
 ---
 description: PPTX/이미지 기획서를 읽어 Unity Editor에 화면을 자동 생성하는 비서. 메인 워크플로우는 "기획서 → 화면 N개 자동 생성".
 mode: primary
-model: anthropic/claude-sonnet-4-5
+model: anthropic/claude-opus-4-8
 permission:
   edit: allow
   bash: ask
