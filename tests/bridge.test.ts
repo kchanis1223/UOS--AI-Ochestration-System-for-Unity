@@ -13,7 +13,7 @@
  *   (backpressure: not implemented in legacy bridge either; verification-only.)
  */
 import { describe, test, expect, beforeAll, afterAll } from "bun:test";
-import { BridgeClient, CallCorrelator, PROTOCOL_VERSION, type ClientMessage } from "./_bridge.ts";
+import { BridgeClient, CallCorrelator, PROTOCOL_VERSION, type ClientMessage } from "../.opencode/tools/_bridge.ts";
 
 // Bun supports server-side WebSocket via Bun.serve({ websocket }).
 // We spin up a fake EditorBridgeServer on an ephemeral port and exercise the

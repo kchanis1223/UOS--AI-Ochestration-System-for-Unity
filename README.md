@@ -60,7 +60,7 @@ uos
 
 ## Acceptance / dev verification
 
-- 4-axis bridge smoke: `bun test ./.opencode/tools/_bridge.test.ts` → 6 pass
+- 4-axis bridge smoke: `bun test ./tests/bridge.test.ts` → 6 pass
 - Tool surface: `bun build ./.opencode/tools/*.ts --target=bun --outdir=/tmp/check` → 0 errors
 - Plan: [`.omc/plans/plan-oh-my-unity-rebrand.md`](./.omc/plans/plan-oh-my-unity-rebrand.md) (consensus-approved)
 - Spec: [`.omc/specs/deep-interview-oh-my-unity-rebrand.md`](./.omc/specs/deep-interview-oh-my-unity-rebrand.md) (ambiguity 17%)

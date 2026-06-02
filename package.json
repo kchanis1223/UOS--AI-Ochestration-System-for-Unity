@@ -8,7 +8,7 @@
     "uos": "./bin/uos.js"
   },
   "scripts": {
-    "test:bridge": "bun test ./.opencode/tools/_bridge.test.ts"
+    "test:bridge": "bun test ./tests/bridge.test.ts"
   },
   "dependencies": {
     "@opencode-ai/plugin": "^1.15.0",

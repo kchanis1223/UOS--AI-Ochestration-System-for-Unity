@@ -48,5 +48,19 @@ We could not isolate whether the cause is in the fixture's `Bun.serve` WebSocket
 
 ## Verification artifact
 
-- `.opencode/tools/_bridge.test.ts` — 6 tests pass, axes 1–4 covered (4 fixture + 2 direct unit).
-- `bun test ./.opencode/tools/_bridge.test.ts` → `6 pass / 0 fail / 7 expect() calls / 584ms`.
+- `tests/bridge.test.ts` — 6 tests pass, axes 1–4 covered (4 fixture + 2 direct unit).
+- `bun test ./tests/bridge.test.ts` → `6 pass / 0 fail / 7 expect() calls`.
+
+## Runtime hygiene (added 2026-06-02)
+
+The test originally lived at `.opencode/tools/_bridge.test.ts`. opencode loads
+*every* `.ts` under `.opencode/tools/` as a candidate tool at runtime — the
+`bun:test` import inside the test file then threw `Cannot use beforeAll()
+outside of the test runner`, which surfaced to users as opaque
+`UnknownError: Unexpected server error / ref: err_xxxxx` on every LLM call.
+
+Resolution: test files MUST NOT live under `.opencode/tools/`. They were
+moved to `tests/bridge.test.ts` with imports updated to
+`../.opencode/tools/_bridge.ts`. The `_` prefix on `_bridge.ts` (the
+production module) is still honored — opencode treats only `_bridge.ts`
+as an internal helper, not as a registered tool.

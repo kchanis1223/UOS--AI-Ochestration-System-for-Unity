@@ -128,7 +128,7 @@ After this, `uos` from any cwd (including inside your Unity project) loads the p
 
 ```bash
 # bun toolchain
-bun test ./.opencode/tools/_bridge.test.ts          # → 6 pass
+bun test ./tests/bridge.test.ts          # → 6 pass
 
 # tools syntax
 bun build ./.opencode/tools/*.ts --target=bun --outdir=/tmp/check  # → 0 errors
