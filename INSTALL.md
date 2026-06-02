@@ -10,6 +10,7 @@ oh-my-unity has two install profiles — pick the one that matches your use case
 | Bun ≥ 1.3 | `bun --version` |
 | opencode CLI ≥ 1.15 | `opencode --version` |
 | Anthropic Claude account (Pro/Max subscription) | `opencode auth list` shows `Anthropic oauth` |
+| Claude Code CLI installed once (for OAuth credentials) | `claude --version` (the `opencode-claude-auth` plugin reads Claude Code's stored credentials) |
 | Node ≥ 18 (for the `uos` launcher) | `node --version` |
 
 If `opencode auth list` is empty, run:
@@ -17,6 +18,12 @@ If `opencode auth list` is empty, run:
 opencode providers login
 # pick "anthropic", complete the OAuth flow in browser
 ```
+
+### Why the `opencode-claude-auth` plugin
+
+Since late 2025, Anthropic blocks third-party tools (including bare opencode) from spending Claude Pro/Max subscription quota — every `uos run` call would fail with `Anthropic API key is missing`. Our `opencode.json` registers the [`opencode-claude-auth`](https://github.com/griffinmartin/opencode-claude-auth) plugin, which bridges the credentials Claude Code CLI already stored on this machine into opencode's anthropic provider. No separate API key, no usage billing — your subscription quota is spent instead.
+
+You only need Claude Code CLI installed and signed in once; the plugin discovers its credentials automatically.
 
 ---
 
@@ -119,6 +126,8 @@ After this, `uos` from any cwd (including inside your Unity project) loads the p
 | `bridge: not connected to Unity` | Editor Bridge not started | Open Monitor window in Editor and click Start |
 | `uos: command not found` | `bun link` never ran or PATH not refreshed | `cd oh-my-unity && bun link`, then open a new shell |
 | `opencode models anthropic` says "Provider not found" | Provider not declared in config | Add `"provider": { "anthropic": {} }` to `opencode.json` (already done in Profile A) |
+| `Anthropic API key is missing` on `uos run` | `opencode-claude-auth` plugin not loaded or Claude Code CLI not signed in | Verify `"plugin": ["opencode-claude-auth@latest"]` in `opencode.json`; `claude --version` should work; if still broken `bun install` to refetch plugin |
+| `UnknownError: Unexpected server error / ref: err_xxxxx` | Test or other non-tool .ts inside `.opencode/tools/` poisons the runtime | Keep only tool modules under `.opencode/tools/`; move tests to `tests/` |
 | `list_planning_materials` returns empty | Wrong cwd or path | Pass `dir` arg explicitly, or set `UNITY_MCP_MATERIALS_DIR` |
 | pptx_to_images throws "not implemented" | Intentional v1 stub | Export PPTX slides to PNG/JPG manually, then `list_planning_materials` |
 

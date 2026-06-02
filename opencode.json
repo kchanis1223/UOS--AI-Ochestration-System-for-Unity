@@ -6,6 +6,9 @@
   "provider": {
     "anthropic": {}
   },
+  "plugin": [
+    "opencode-claude-auth@latest"
+  ],
   "permission": {
     "edit": "allow",
     "bash": "ask",
