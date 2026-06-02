@@ -1,7 +1,7 @@
-# Node sidecar (legacy, kept until Phase E archive)
-mcp-server/node_modules/
-mcp-server/dist/
-mcp-server/*.tsbuildinfo
+# Node sidecar (legacy, archived after Phase E)
+_archive/mcp-server-node/node_modules/
+_archive/mcp-server-node/dist/
+_archive/mcp-server-node/*.tsbuildinfo
 npm-debug.log*
 
 # Bun / opencode native runtime
