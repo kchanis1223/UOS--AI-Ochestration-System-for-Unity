@@ -1,0 +1,168 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1780296523416,
+  "projectRoot": "C:\\Users\\lyx\\MCP_for_Unity_LYX\\mcp-server",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": ">=18",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "vitest",
+        "version": "2.1.0",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": "Node.js 18"
+  },
+  "build": {
+    "buildCommand": "cd C:/Users/lyx/MCP_for_Unity_LYX/mcp-server && npm run build 2>&1 | tail -10",
+    "testCommand": "cd C:/Users/lyx/MCP_for_Unity_LYX/mcp-server && npm test 2>&1 | tail -25",
+    "lintCommand": null,
+    "devCommand": "npm run start",
+    "scripts": {
+      "build": "tsc -p tsconfig.json",
+      "test": "vitest run",
+      "test:watch": "vitest",
+      "typecheck": "tsc -p tsconfig.json --noEmit",
+      "start": "node dist/index.js"
+    }
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "importStyle": "ES modules",
+    "testPattern": "*.test.ts",
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src",
+      "test"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 9,
+      "lastAccessed": 1780296523358,
+      "keyFiles": [
+        "config.d.ts",
+        "config.js",
+        "config.js.map",
+        "index.d.ts",
+        "index.js"
+      ]
+    },
+    "schemas": {
+      "path": "schemas",
+      "purpose": "Schema definitions",
+      "fileCount": 1,
+      "lastAccessed": 1780296523359,
+      "keyFiles": [
+        "planning-intent.schema.json"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 3,
+      "lastAccessed": 1780296523374,
+      "keyFiles": [
+        "config.ts",
+        "index.ts",
+        "server.ts"
+      ]
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 6,
+      "lastAccessed": 1780296523374,
+      "keyFiles": [
+        "coordinates.test.ts",
+        "dispatch.test.ts",
+        "idMap.test.ts",
+        "intentValidation.test.ts",
+        "protocol.test.ts"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "D:\\UnityProject\\JangHeung\\Packages\\manifest.json",
+      "accessCount": 2,
+      "lastAccessed": 1780301547980,
+      "type": "file"
+    },
+    {
+      "path": "test\\planningMaterials.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780300469479,
+      "type": "file"
+    },
+    {
+      "path": "src\\bridge\\protocol.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780301966629,
+      "type": "file"
+    },
+    {
+      "path": "src\\bridge\\bridgeClient.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780301966670,
+      "type": "file"
+    },
+    {
+      "path": "src\\config.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780301981414,
+      "type": "file"
+    },
+    {
+      "path": "src\\server.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780301981441,
+      "type": "file"
+    },
+    {
+      "path": "test\\dispatch.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780302002083,
+      "type": "file"
+    },
+    {
+      "path": "test\\bridgeClient.e2e.test.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780302058187,
+      "type": "file"
+    },
+    {
+      "path": "src\\tools\\planningMaterials.ts",
+      "accessCount": 1,
+      "lastAccessed": 1780303757196,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

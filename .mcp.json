@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "unity-conv-mcp": {
+      "command": "node",
+      "args": ["C:/Users/lyx/MCP_for_Unity_LYX/mcp-server/dist/index.js"],
+      "env": {
+        "UNITY_MCP_HOST": "127.0.0.1",
+        "UNITY_MCP_PORT": "17801",
+        "UNITY_MCP_TOKEN": "33f5a15c205848f6b6e731d027eb9fb2"
+      }
+    }
+  }
+}

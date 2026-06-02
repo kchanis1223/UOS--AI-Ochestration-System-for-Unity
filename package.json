@@ -1,0 +1,19 @@
+{
+  "name": "oh-my-unity",
+  "version": "0.1.0",
+  "description": "opencode.ai native tools + Unity Editor Bridge — conversational UI authoring for Unity.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test:bridge": "bun test ./.opencode/tools/_bridge.test.ts"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "^1.15.0",
+    "ws": "^8.18.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.13",
+    "@types/bun": "latest"
+  }
+}

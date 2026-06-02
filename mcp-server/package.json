@@ -1,0 +1,37 @@
+{
+  "name": "@lyx/unity-conv-mcp-sidecar",
+  "version": "0.1.0",
+  "description": "Client-agnostic MCP sidecar for the Unity 6 conversational UI content server. Speaks stdio MCP to clients and proxies to the Unity Editor over a localhost WebSocket bridge.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "unity-conv-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "schemas"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}
