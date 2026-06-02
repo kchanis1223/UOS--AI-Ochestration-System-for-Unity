@@ -9,7 +9,7 @@ import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";
 import { promises as fs } from "node:fs";
 import { pathToFileURL } from "node:url";
-import { extname, isAbsolute, resolve } from "node:path";
+import { extname, isAbsolute, resolve, basename } from "node:path";
 
 const DEFAULT_BASE64_CAP_BYTES = 2 * 1024 * 1024;
 
@@ -65,22 +65,36 @@ export default tool({
 
     const ext = extname(resolved).toLowerCase();
     const mimeType = guessMimeType(ext);
+    const isImage = mimeType.startsWith("image/");
+    const uri = pathToFileURL(resolved).toString();
+    const filename = basename(resolved);
+
+    // ToolAttachment surface: lets the LLM perform multimodal vision on the file
+    // instead of seeing only metadata. Images get file:// URLs; non-images
+    // (pdf/pptx/key) are exposed too so the LLM can request appropriate handling.
+    const attachments = [{ type: "file" as const, mime: mimeType, url: uri, filename }];
 
     if (stat.size > DEFAULT_BASE64_CAP_BYTES) {
-      const uri = pathToFileURL(resolved).toString();
       return {
-        title: `read_planning_material: ${resolved} (uri, ${stat.size}b)`,
-        output: `File too large for inline base64 (${stat.size}b > ${DEFAULT_BASE64_CAP_BYTES}b). Served as URI:\n${uri}`,
-        metadata: { ok: true, path: resolved, mimeType, uri, size: stat.size },
+        title: `read_planning_material: ${filename} (uri, ${stat.size}b)`,
+        output:
+          `File loaded as attachment for vision (mimeType=${mimeType}, size=${stat.size}b).\n` +
+          `Path: ${resolved}\n` +
+          `URI: ${uri}`,
+        metadata: { ok: true, path: resolved, mimeType, uri, size: stat.size, isImage },
+        attachments,
       };
     }
 
     const bytes = await fs.readFile(resolved);
     const base64Data = bytes.toString("base64");
     return {
-      title: `read_planning_material: ${resolved} (inline ${mimeType}, ${stat.size}b)`,
-      output: `File loaded inline (mimeType=${mimeType}, size=${stat.size}b, base64 length=${base64Data.length}).`,
-      metadata: { ok: true, path: resolved, mimeType, base64Data, size: stat.size },
+      title: `read_planning_material: ${filename} (${mimeType}, ${stat.size}b)`,
+      output:
+        `File loaded as attachment for vision (mimeType=${mimeType}, size=${stat.size}b).\n` +
+        `Path: ${resolved}`,
+      metadata: { ok: true, path: resolved, mimeType, base64Data, size: stat.size, isImage },
+      attachments,
     };
   },
 });

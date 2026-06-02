@@ -4,6 +4,9 @@
   "description": "opencode.ai native tools + Unity Editor Bridge — conversational UI authoring for Unity.",
   "type": "module",
   "private": true,
+  "bin": {
+    "uos": "./bin/uos.js"
+  },
   "scripts": {
     "test:bridge": "bun test ./.opencode/tools/_bridge.test.ts"
   },
