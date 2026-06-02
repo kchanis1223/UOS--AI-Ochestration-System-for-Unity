@@ -42,6 +42,13 @@ namespace Lyx.OhMyUnity
 
         /// <summary>RectTransform anchor preset name (default MiddleCenter).</summary>
         public string anchor;
+
+        /// <summary>
+        /// Style/content properties applied per element type. Optional; null = wireframe (legacy v0.1 behavior).
+        /// Concrete handling lives in UguiBackend.ApplyProps. Use a fixed-field type instead of a free-form
+        /// dictionary so JsonUtility (which silently drops unknown fields) can round-trip it.
+        /// </summary>
+        public ElementProps props;
     }
 
     /// <summary>Normalized rectangle, top-left origin, 0..1 fraction of the reference canvas.</summary>
@@ -52,5 +59,28 @@ namespace Lyx.OhMyUnity
         public float y;
         public float w;
         public float h;
+    }
+
+    /// <summary>
+    /// Fixed-field style/content props. JsonUtility-compatible (no dictionaries). Each field is optional;
+    /// empty/zero means "leave default". See UguiBackend.ApplyProps for per-type interpretation.
+    /// </summary>
+    [Serializable]
+    public class ElementProps
+    {
+        /// <summary>Text label (Text content, Button label, InputField placeholder).</summary>
+        public string text;
+
+        /// <summary>Foreground/background color as "#RRGGBB" or "#RRGGBBAA". Empty = leave default.</summary>
+        public string color;
+
+        /// <summary>Text font size in pt. 0 = leave default.</summary>
+        public int fontSize;
+
+        /// <summary>Sprite asset path (e.g. "Assets/UI/btn.png"). Resolved via AssetDatabase.LoadAssetAtPath.</summary>
+        public string sprite;
+
+        /// <summary>TextAnchor preset name (Left/Center/Right or MiddleCenter etc.). Empty = MiddleCenter default.</summary>
+        public string align;
     }
 }

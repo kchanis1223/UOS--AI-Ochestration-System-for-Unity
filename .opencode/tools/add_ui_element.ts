@@ -6,17 +6,32 @@ import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";
 import { call } from "./_bridge";
 
-const RectSchema = z.object({ x: z.number(), y: z.number(), w: z.number(), h: z.number() });
+// Normalized rect (0..1, top-left origin, referenceCanvas fraction).
+const RectSchema = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  w: z.number().gt(0).max(1),
+  h: z.number().gt(0).max(1),
+});
 const ElementTypeEnum = z.enum([
   "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown",
 ]);
+// Mirrors create_ui_screen.ts ElementPropsSchema. See UguiBackend.ApplyProps for handling.
+const ElementPropsSchema = z.object({
+  text: z.string().optional(),
+  color: z.string().optional().describe("Hex color, '#RRGGBB' or '#RRGGBBAA'."),
+  fontSize: z.number().int().nonnegative().optional(),
+  sprite: z.string().optional().describe("Sprite asset path resolvable by AssetDatabase."),
+  align: z.string().optional().describe("Alignment preset name."),
+}).optional();
+
 const ElementSchema = z.object({
   clientHintId: z.string().optional(),
   parentClientHintId: z.string().optional(),
   type: ElementTypeEnum,
   rect: RectSchema,
   anchor: z.string().optional(),
-  props: z.record(z.string(), z.unknown()).optional(),
+  props: ElementPropsSchema,
 });
 
 export default tool({

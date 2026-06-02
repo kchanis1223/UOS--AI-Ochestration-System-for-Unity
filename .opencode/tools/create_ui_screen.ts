@@ -13,16 +13,34 @@ import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";
 import { call } from "./_bridge";
 
+// Normalized rect (0..1 fraction of referenceCanvas, top-left origin).
+// Mirrors IntentParser.ValidateRect on the Unity side so violations are
+// caught client-side before the round-trip rather than silent off-screen.
 const RectSchema = z.object({
-  x: z.number(),
-  y: z.number(),
-  w: z.number(),
-  h: z.number(),
+  x: z.number().min(0).max(1).describe("Normalized x (0..1) relative to referenceCanvas, top-left origin."),
+  y: z.number().min(0).max(1).describe("Normalized y (0..1) relative to referenceCanvas, top-left origin."),
+  w: z.number().gt(0).max(1).describe("Normalized width (0,1] relative to referenceCanvas."),
+  h: z.number().gt(0).max(1).describe("Normalized height (0,1] relative to referenceCanvas."),
 });
 
 const ElementTypeEnum = z.enum([
   "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown",
 ]);
+
+// Explicit, JsonUtility-compatible style/content props. Free-form dictionaries
+// were silently discarded by the Unity backend (see docs/feedback/2026-06-02-e2e-jangheung.md Top #1).
+// Per-type interpretation lives in UguiBackend.ApplyProps:
+//   Text       — text / fontSize / color / align
+//   Button     — color (background) / text (label) / sprite
+//   Image|Panel — color / sprite
+//   InputField — text (placeholder) / color
+const ElementPropsSchema = z.object({
+  text: z.string().optional().describe("Text content / Button label / InputField placeholder."),
+  color: z.string().optional().describe("Hex color, '#RRGGBB' or '#RRGGBBAA'."),
+  fontSize: z.number().int().nonnegative().optional().describe("Text font size in pt (0 = leave default)."),
+  sprite: z.string().optional().describe("Sprite asset path resolvable by AssetDatabase, e.g. 'Assets/UI/btn.png'."),
+  align: z.string().optional().describe("Alignment: Left / Center / Right / TopLeft / MiddleCenter / etc. (default MiddleCenter)."),
+}).optional();
 
 const ElementSchema: z.ZodTypeAny = z.object({
   clientHintId: z.string().describe("Advisory client id; authoritative only for intra-call parent linkage.").optional(),
@@ -30,7 +48,7 @@ const ElementSchema: z.ZodTypeAny = z.object({
   type: ElementTypeEnum,
   rect: RectSchema,
   anchor: z.string().optional(),
-  props: z.record(z.string(), z.unknown()).optional(),
+  props: ElementPropsSchema,
 });
 
 const PlanningIntentSchema = z.object({
@@ -78,9 +96,21 @@ export default tool({
       screenId: string;
       elements: Array<{ clientHintId?: string; elementId: string }>;
     };
+    // Surface the clientHintId→elementId mapping in the output text — agents need
+    // the canonical elementIds for subsequent update/move/delete/transition calls
+    // and previously had to re-query get_scene_hierarchy.
+    const mappingRows = data.elements
+      .map((p, i) => `| ${i + 1} | ${p.clientHintId ?? "(none)"} | ${p.elementId} |`)
+      .join("\n");
+    const mappingTable =
+      data.elements.length > 0
+        ? `\n\n| # | clientHintId | elementId |\n|---|---|---|\n${mappingRows}`
+        : "";
     return {
       title: `create_ui_screen: ${args.intent.screenName} → ${data.screenId}`,
-      output: `Created screen "${args.intent.screenName}" (id=${data.screenId}) with ${data.elements.length} elements.`,
+      output:
+        `Created screen "${args.intent.screenName}" (id=${data.screenId}) with ${data.elements.length} element(s).` +
+        mappingTable,
       metadata: { ok: true, ...data },
     };
   },

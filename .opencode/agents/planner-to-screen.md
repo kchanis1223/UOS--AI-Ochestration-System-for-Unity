@@ -48,7 +48,14 @@ permission:
 3. **PlanningIntent 작성** — 화면 1개당:
    - `screenName`: 자료에서 추론한 식별 이름 (예: "LoginScreen")
    - `referenceCanvas`: 자료의 기준 해상도 (없으면 1920×1080)
-   - `elements`: 각 요소를 `{type, rect, anchor?, props?, clientHintId?, parentClientHintId?}` 형식. `type`은 `Panel|Text|Button|Image|InputField|Toggle|Slider|ScrollView|Dropdown` 중 하나. `rect`는 절대 픽셀 좌표 (referenceCanvas 기준), `clientHintId`는 같은 호출 내 부모-자식 참조용.
+   - `elements`: 각 요소를 `{type, rect, anchor?, props?, clientHintId?, parentClientHintId?}` 형식. `type`은 `Panel|Text|Button|Image|InputField|Toggle|Slider|ScrollView|Dropdown` 중 하나. **`rect`는 referenceCanvas 기준 0..1 정규화 좌표** (좌상단 원점, `x`/`y` ∈ [0,1], `w`/`h` ∈ (0,1]). 예: `referenceCanvas: 1920×1080`에서 화면 중앙의 480×270 박스는 `{x:0.375, y:0.375, w:0.25, h:0.25}`. **픽셀 좌표 입력 금지** — 0..1 범위를 벗어나면 서버가 거부함.
+   - `clientHintId`는 같은 호출 내 부모-자식 참조용 (한 번 화면 생성 후엔 server-minted `elementId`만 권위 있음).
+   - **`props`** (v0.1.1+): 요소 스타일/내용. type별 적용 필드:
+     - `Text` → `text`, `fontSize`, `color`(hex `#RRGGBB`), `align`(Left/Center/Right/MiddleCenter 등)
+     - `Button` → `color`(배경), `text`(자동 자식 Label 생성), `sprite`(배경 이미지)
+     - `Image`/`Panel` → `color`, `sprite`(`Assets/UI/...` 경로)
+     - `InputField` → `text`(placeholder), `color`(배경)
+     - 미지정 필드는 Unity 기본값 유지. `props` 자체를 생략하면 v0.1 wireframe 동작.
 4. **화면 생성** — `create_ui_screen({intent})`로 1회 호출. 결과의 `screenId`와 element 매핑을 메모리에 보관.
 5. **반복** — 다음 화면도 동일하게. 사용자가 화면 N개를 한 번에 요청하면 화면별로 step 3-4 반복.
 6. **흐름 추가** (해당 시) — `create_screen_transition({fromId, toId, trigger})`로 화면 간 이동 정의.
@@ -59,7 +66,7 @@ permission:
 
 - **clientHintId vs elementId 혼동 금지** — `clientHintId`는 같은 `create_ui_screen` 호출 안에서 부모-자식 참조용 advisory ID. 한번 화면이 생성되면 server가 minted한 canonical `elementId`만 권위가 있으며, 이후의 모든 수정/이동/삭제는 `elementId`로만 가능.
 - **PlanningIntent version은 반드시 "1.0.0"** — 다른 값 사용 시 서버가 거부.
-- **rect는 referenceCanvas 기준 픽셀** (정규화 0..1이 아님). `move_ui_element`의 rect만 정규화 0..1.
+- **rect는 referenceCanvas 기준 0..1 정규화** — 모든 도구(`create_ui_screen`, `add_ui_element`, `update_ui_element`, `move_ui_element`)에서 동일. 픽셀 좌표 사용 금지. 0..1 범위 위반은 서버가 즉시 reject.
 - **NotImplemented stub(`pptx_to_images`/`preprocess_image`) 호출 금지** — 즉시 throw. 사용자에게 사전 처리 안내.
 - **Unity Editor 연결 필요** — bridge 도구들은 `EditorBridgeServer.cs`가 실행 중인 Unity Editor가 켜져 있어야 동작. 미동작 시 `bridge: not connected to Unity` 에러. 사용자에게 Unity Editor 실행을 안내.
 

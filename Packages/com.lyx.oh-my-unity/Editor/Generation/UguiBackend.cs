@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -139,7 +140,9 @@ namespace Lyx.OhMyUnity.Editor
             switch (el.type)
             {
                 case "Text":
-                    go.AddComponent<Text>();
+                    var txt = go.AddComponent<Text>();
+                    txt.font = DefaultFont();
+                    txt.color = Color.black;
                     break;
                 case "Button":
                     go.AddComponent<Image>();
@@ -171,7 +174,154 @@ namespace Lyx.OhMyUnity.Editor
                     go.AddComponent<Image>();
                     break;
             }
+
+            ApplyProps(go, el);
             return go;
+        }
+
+        // v0.1.1 props pass — see docs/feedback/2026-06-02-e2e-jangheung.md (Top #1).
+        // Per-type interpretation:
+        //   Text       — props.text / fontSize / color / align
+        //   Button     — props.color → background Image color, props.text → child Label (Text)
+        //   Image/Panel → props.color, props.sprite
+        //   InputField — props.text → placeholder, props.color → background
+        // Missing props leave Unity defaults (a no-op vs the legacy white-wireframe behavior).
+        private static void ApplyProps(GameObject go, IntentElementData el)
+        {
+            if (el.props == null) return;
+
+            switch (el.type)
+            {
+                case "Text":
+                {
+                    var t = go.GetComponent<Text>();
+                    if (t == null) return;
+                    if (!string.IsNullOrEmpty(el.props.text)) t.text = el.props.text;
+                    if (el.props.fontSize > 0) t.fontSize = el.props.fontSize;
+                    if (TryParseColor(el.props.color, out Color tc)) t.color = tc;
+                    t.alignment = ParseAlignment(el.props.align, TextAnchor.MiddleCenter);
+                    break;
+                }
+                case "Button":
+                {
+                    var img = go.GetComponent<Image>();
+                    if (img != null && TryParseColor(el.props.color, out Color bc)) img.color = bc;
+                    Sprite bs = TryLoadSprite(el.props.sprite);
+                    if (img != null && bs != null) img.sprite = bs;
+                    if (!string.IsNullOrEmpty(el.props.text)) AttachButtonLabel(go, el.props);
+                    break;
+                }
+                case "Image":
+                case "Panel":
+                {
+                    var img = go.GetComponent<Image>();
+                    if (img == null) return;
+                    if (TryParseColor(el.props.color, out Color c)) img.color = c;
+                    Sprite s = TryLoadSprite(el.props.sprite);
+                    if (s != null) img.sprite = s;
+                    break;
+                }
+                case "InputField":
+                {
+                    var img = go.GetComponent<Image>();
+                    if (img != null && TryParseColor(el.props.color, out Color fc)) img.color = fc;
+                    if (!string.IsNullOrEmpty(el.props.text)) AttachInputFieldPlaceholder(go, el.props);
+                    break;
+                }
+            }
+        }
+
+        private static void AttachButtonLabel(GameObject button, ElementProps props)
+        {
+            var labelGo = new GameObject("Label");
+            labelGo.transform.SetParent(button.transform, false);
+            var rt = labelGo.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            var label = labelGo.AddComponent<Text>();
+            label.text = props.text;
+            label.font = DefaultFont();
+            label.alignment = ParseAlignment(props.align, TextAnchor.MiddleCenter);
+            label.color = TryParseColor(props.color, out Color lc) ? Contrast(lc) : Color.black;
+            if (props.fontSize > 0) label.fontSize = props.fontSize;
+        }
+
+        private static void AttachInputFieldPlaceholder(GameObject input, ElementProps props)
+        {
+            var inputField = input.GetComponent<InputField>();
+            if (inputField == null) return;
+            var phGo = new GameObject("Placeholder");
+            phGo.transform.SetParent(input.transform, false);
+            var rt = phGo.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+            rt.offsetMin = new Vector2(8f, 4f);
+            rt.offsetMax = new Vector2(-8f, -4f);
+            var ph = phGo.AddComponent<Text>();
+            ph.text = props.text;
+            ph.font = DefaultFont();
+            ph.color = new Color(0.5f, 0.5f, 0.5f, 0.7f);
+            ph.alignment = ParseAlignment(props.align, TextAnchor.MiddleLeft);
+            if (props.fontSize > 0) ph.fontSize = props.fontSize;
+            inputField.placeholder = ph;
+        }
+
+        private static Font DefaultFont()
+        {
+            // Unity 6 ships LegacyRuntime.ttf as the built-in legacy Text font.
+            Font f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            return f != null ? f : Resources.GetBuiltinResource<Font>("Arial.ttf");
+        }
+
+        private static bool TryParseColor(string raw, out Color color)
+        {
+            color = default;
+            if (string.IsNullOrEmpty(raw)) return false;
+            return ColorUtility.TryParseHtmlString(raw, out color);
+        }
+
+        private static Sprite TryLoadSprite(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath)) return null;
+            var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+            if (sprite == null) Debug.LogWarning($"[OhMyUnity] sprite not found at \"{assetPath}\"");
+            return sprite;
+        }
+
+        private static TextAnchor ParseAlignment(string raw, TextAnchor fallback)
+        {
+            if (string.IsNullOrEmpty(raw)) return fallback;
+            string normalized = raw.Trim();
+            switch (normalized)
+            {
+                case "Left":         return TextAnchor.MiddleLeft;
+                case "Center":       return TextAnchor.MiddleCenter;
+                case "Right":        return TextAnchor.MiddleRight;
+                case "Top":          return TextAnchor.UpperCenter;
+                case "Bottom":       return TextAnchor.LowerCenter;
+                case "TopLeft":      return TextAnchor.UpperLeft;
+                case "TopRight":     return TextAnchor.UpperRight;
+                case "BottomLeft":   return TextAnchor.LowerLeft;
+                case "BottomRight":  return TextAnchor.LowerRight;
+                case "MiddleLeft":   return TextAnchor.MiddleLeft;
+                case "MiddleCenter": return TextAnchor.MiddleCenter;
+                case "MiddleRight":  return TextAnchor.MiddleRight;
+                case "UpperCenter":  return TextAnchor.UpperCenter;
+                case "LowerCenter":  return TextAnchor.LowerCenter;
+            }
+            return Enum.TryParse(normalized, true, out TextAnchor anchor) ? anchor : fallback;
+        }
+
+        // Choose black or white label color depending on background brightness so a Button's
+        // text stays readable on any user-chosen background color.
+        private static Color Contrast(Color bg)
+        {
+            float luminance = 0.299f * bg.r + 0.587f * bg.g + 0.114f * bg.b;
+            return luminance > 0.5f ? Color.black : Color.white;
         }
 
         private static void ApplyRect(GameObject go, IntentElementData el, float canvasWidth, float canvasHeight)
