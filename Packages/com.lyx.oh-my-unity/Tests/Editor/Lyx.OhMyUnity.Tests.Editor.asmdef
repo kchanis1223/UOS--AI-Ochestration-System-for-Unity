@@ -5,7 +5,8 @@
     "Lyx.OhMyUnity.Runtime",
     "Lyx.OhMyUnity.Editor",
     "UnityEngine.TestRunner",
-    "UnityEditor.TestRunner"
+    "UnityEditor.TestRunner",
+    "UnityEngine.VideoModule"
   ],
   "includePlatforms": [
     "Editor"

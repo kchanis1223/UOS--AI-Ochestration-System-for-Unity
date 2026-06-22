@@ -1,7 +1,9 @@
 {
   "name": "Lyx.OhMyUnity.Runtime",
   "rootNamespace": "Lyx.OhMyUnity",
-  "references": [],
+  "references": [
+    "UnityEngine.UI"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

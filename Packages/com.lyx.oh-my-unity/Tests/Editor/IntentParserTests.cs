@@ -3,8 +3,8 @@ using NUnit.Framework;
 namespace Lyx.OhMyUnity.Tests
 {
     /// <summary>
-    /// Mirrors mcp-server/test/intentValidation.test.ts so the Unity-side defense-in-depth
-    /// validator stays in lockstep with the sidecar's preflight.
+    /// Mirrors the UOS opencode PlanningIntent tests so the Unity-side defense-in-depth
+    /// validator stays in lockstep with the tool-layer preflight.
     /// </summary>
     [TestFixture]
     public sealed class IntentParserTests

@@ -1,17 +1,21 @@
 {
   "name": "oh-my-unity",
   "version": "0.1.0",
-  "description": "opencode.ai native tools + Unity Editor Bridge — conversational UI authoring for Unity.",
+  "description": "opencode.ai native tools + Unity Editor Bridge for conversational UI authoring in Unity.",
   "type": "module",
   "private": true,
   "bin": {
     "uos": "./bin/uos.js"
   },
   "scripts": {
+    "test": "bun test ./tests/bridge.test.ts ./tests/uos-core.test.ts ./tests/materials.test.ts ./tests/uos-context.test.ts ./tests/uos-plugin-index.test.ts ./tests/opencode-tools-schema.test.ts ./tests/planning-intent.test.ts ./tests/orchestrator-agent.test.ts ./tests/submodel-contract.test.ts ./tests/uos-setup.test.ts ./tests/kiosk.test.ts ./tests/kiosk-build.test.ts ./tests/uos-modes.test.ts ./tests/uos-artifacts.test.ts ./tests/editor-batch.test.ts ./tests/orchestrator-progress.test.ts ./tests/registry-dedupe.test.ts ./tests/unity-target-selection.test.ts",
     "test:bridge": "bun test ./tests/bridge.test.ts"
   },
   "dependencies": {
     "@opencode-ai/plugin": "^1.15.0",
+    "jszip": "^3.10.1",
+    "pdf-parse": "^2.4.5",
+    "sharp": "^0.34.5",
     "ws": "^8.18.0",
     "zod": "^3.23.0"
   },

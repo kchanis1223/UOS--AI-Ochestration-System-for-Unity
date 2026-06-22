@@ -14,10 +14,12 @@
  * ADR-0001 axes (verified in _bridge.test.ts):
  *   1. connect:           ws://host:port handshake + welcome version check
  *   2. ping/pong:         application-level JSON heartbeat (NOT WS control frames)
- *   3. close-frame:       normal close → status disconnected, schedule reconnect
- *   4. error propagation: server result.ok=false → call() rejects with that error
+ *   3. close-frame:       normal close -> status disconnected, schedule reconnect
+ *   4. error propagation: server result.ok=false -> call() rejects with that error
  *   (backpressure: verification-only; not implemented in legacy bridge either)
  */
+
+import { readActiveUnityTarget, targetConfigKey } from "./_unity_target_state";
 
 export const PROTOCOL_VERSION = "1.0.0";
 
@@ -285,8 +287,7 @@ export class BridgeClient {
   }
 }
 
-function resolveConfig(): BridgeConfig {
-  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+function resolveConfigFromEnv(env: Record<string, string | undefined> = processEnv()): BridgeConfig {
   const portRaw = env["UNITY_MCP_PORT"]?.trim();
   const port = portRaw !== undefined && portRaw.length > 0
     ? (Number.parseInt(portRaw, 10) || DEFAULT_PORT)
@@ -306,12 +307,54 @@ function resolveConfig(): BridgeConfig {
 }
 
 let _singleton: BridgeClient | undefined;
+let _singletonKey: string | undefined;
 export function bridge(): BridgeClient {
-  if (_singleton === undefined) _singleton = new BridgeClient(resolveConfig());
+  if (_singleton === undefined) {
+    const config = resolveConfigFromEnv();
+    _singleton = new BridgeClient(config);
+    _singletonKey = configKey(config);
+  }
   return _singleton;
 }
 
 /** Convenience: call a Unity-side tool. Lazy-connects on first use. */
 export async function call(tool: string, args: unknown): Promise<unknown> {
-  return bridge().call(tool, args);
+  const config = await resolveActiveConfig();
+  const key = configKey(config);
+  if (_singleton === undefined || _singletonKey !== key) {
+    _singleton?.close();
+    _singleton = new BridgeClient(config);
+    _singletonKey = key;
+  }
+  return _singleton.call(tool, args);
+}
+
+async function resolveActiveConfig(): Promise<BridgeConfig> {
+  const env = processEnv();
+  const active = await readActiveUnityTarget({ env });
+  if (active !== undefined) {
+    return {
+      host: active.target.host ?? DEFAULT_HOST,
+      port: active.target.port ?? DEFAULT_PORT,
+      sharedToken: active.target.token ?? "",
+      protocolVersion: PROTOCOL_VERSION,
+      callTimeoutMs: 30_000,
+      reconnectBaseMs: 500,
+      reconnectMaxMs: 10_000,
+      heartbeatMs: 15_000,
+    };
+  }
+  return resolveConfigFromEnv(env);
+}
+
+function configKey(config: BridgeConfig): string {
+  return targetConfigKey({
+    host: config.host,
+    port: config.port,
+    token: config.sharedToken,
+  });
+}
+
+function processEnv(): Record<string, string | undefined> {
+  return (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
 }

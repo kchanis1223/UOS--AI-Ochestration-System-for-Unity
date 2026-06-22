@@ -3,6 +3,7 @@ _archive/mcp-server-node/node_modules/
 _archive/mcp-server-node/dist/
 _archive/mcp-server-node/*.tsbuildinfo
 npm-debug.log*
+debug.log
 
 # Bun / opencode native runtime
 node_modules/
@@ -25,6 +26,9 @@ bun.lockb
 *.suo
 
 # OMC / opencode internal state
+.uos/
+.omx/
+.claude/
 .omc/state/
 .omc/sessions/
 .omc/project-memory.json

@@ -37,7 +37,10 @@ We could not isolate whether the cause is in the fixture's `Bun.serve` WebSocket
 
 ## Consequences
 
-- All 13 tools share one module-level `BridgeClient` singleton via `import { call } from "./_bridge"`. Connection cost paid once per opencode session, not per tool.
+- All bridge-backed tools, including the original 13-tool surface and later UOS
+  extensions, share one module-level `BridgeClient` singleton via
+  `import { call } from "./_bridge"`. Connection cost is paid once per opencode
+  session, not per tool.
 - `_bridge.ts` exports `BridgeClient`, `CallCorrelator`, `PROTOCOL_VERSION`, `HandshakeError`, `ClientMessage`, `ServerMessage` — internals exposed only for the test surface.
 - No runtime `ws` import. `package.json` keeps `ws` as a transitive devDep for `mcp-server/` archive use and as a potential Phase D fallback.
 

@@ -4,9 +4,9 @@ using UnityEditor;
 namespace Lyx.OhMyUnity.Editor
 {
     /// <summary>
-    /// Persisted bridge configuration (host/port/shared token) backed by EditorPrefs. The sidecar
-    /// reads the matching values from its environment (UNITY_MCP_HOST/PORT/TOKEN); the MonitorWindow
-    /// emits a client config snippet from these so the two stay in lockstep (decision D1, risk R8).
+    /// Persisted bridge configuration (host/port/shared token) backed by EditorPrefs. The local UOS
+    /// launcher injects matching values into opencode (UNITY_MCP_HOST/PORT/TOKEN), and MonitorWindow
+    /// shows an explicit-env fallback snippet for manual troubleshooting (decision D1, risk R8).
     ///
     /// EditorPrefs is main-thread only, so <see cref="EditorBridgeServer"/> snapshots these on Start
     /// and the background socket threads compare against the snapshot rather than touching EditorPrefs.
@@ -22,6 +22,13 @@ namespace Lyx.OhMyUnity.Editor
         private const string PortKey = "Lyx.UnityConvMcp.Port";
         private const string HostKey = "Lyx.UnityConvMcp.Host";
         private const string TokenKey = "Lyx.UnityConvMcp.Token";
+        private const string AutoStartKey = "Lyx.UnityConvMcp.AutoStart";
+
+        public static bool AutoStart
+        {
+            get => EditorPrefs.GetBool(AutoStartKey, true);
+            set => EditorPrefs.SetBool(AutoStartKey, value);
+        }
 
         public static int Port
         {

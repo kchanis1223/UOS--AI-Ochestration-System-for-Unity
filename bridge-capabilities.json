@@ -1,0 +1,35 @@
+{
+  "requiredTools": [
+    "get_project_info",
+    "list_screens",
+    "get_scene_hierarchy",
+    "capture_preview",
+    "list_scene_objects",
+    "create_ui_screen",
+    "add_ui_element",
+    "update_ui_element",
+    "move_ui_element",
+    "delete_ui_element",
+    "create_screen_transition",
+    "set_active_screen",
+    "save_scene",
+    "import_asset",
+    "create_scene_object",
+    "update_scene_object",
+    "delete_scene_object"
+  ],
+  "requiredWriteTools": [
+    "create_ui_screen",
+    "add_ui_element",
+    "update_ui_element",
+    "move_ui_element",
+    "delete_ui_element",
+    "create_screen_transition",
+    "set_active_screen",
+    "save_scene",
+    "import_asset",
+    "create_scene_object",
+    "update_scene_object",
+    "delete_scene_object"
+  ]
+}

@@ -1,5 +1,5 @@
 /**
- * delete_ui_element — bridge proxy. Deletes an element by canonical elementId.
+ * delete_ui_element - bridge proxy. Deletes an element by canonical elementId.
  */
 import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";

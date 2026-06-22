@@ -6,9 +6,9 @@ using UnityEngine;
 namespace Lyx.OhMyUnity.Editor
 {
     /// <summary>
-    /// Passive monitor/dashboard for the MCP bridge (AC-8: monitor, never a chat surface). Shows the
-    /// listener status, the shared token + a copyable client config snippet (so the user can point any
-    /// MCP client at this Editor), and a live tool-call log fed by <see cref="ToolCallLog"/>.
+    /// Passive monitor/dashboard for the UOS bridge (AC-8: monitor, never a chat surface). Shows the
+    /// listener status, the shared token + copyable UOS launcher fallback env, and a live tool-call log
+    /// fed by <see cref="ToolCallLog"/>.
     ///
     /// All generation is driven by the external client over the bridge; this window only observes.
     /// </summary>
@@ -43,7 +43,7 @@ namespace Lyx.OhMyUnity.Editor
             EditorGUILayout.Space();
             DrawConnection();
             EditorGUILayout.Space();
-            DrawClientConfig();
+            DrawUosLauncherSnippet();
             EditorGUILayout.Space();
             DrawLog();
         }
@@ -51,6 +51,17 @@ namespace Lyx.OhMyUnity.Editor
         private void DrawStatus()
         {
             EditorGUILayout.LabelField("Bridge Status", EditorStyles.boldLabel);
+            bool autoStart = BridgeSettings.AutoStart;
+            bool nextAutoStart = EditorGUILayout.ToggleLeft("Auto start bridge when this Unity project opens", autoStart);
+            if (nextAutoStart != autoStart)
+            {
+                BridgeSettings.AutoStart = nextAutoStart;
+                if (nextAutoStart && !EditorBridgeServer.IsRunning)
+                {
+                    EditorBridgeServer.Start();
+                }
+            }
+
             using (new EditorGUILayout.HorizontalScope())
             {
                 bool running = EditorBridgeServer.IsRunning;
@@ -71,6 +82,7 @@ namespace Lyx.OhMyUnity.Editor
                 {
                     if (GUILayout.Button("Stop"))
                     {
+                        BridgeSettings.AutoStart = false;
                         EditorBridgeServer.Stop();
                     }
                 }
@@ -107,20 +119,20 @@ namespace Lyx.OhMyUnity.Editor
             }
         }
 
-        private void DrawClientConfig()
+        private void DrawUosLauncherSnippet()
         {
-            EditorGUILayout.LabelField("Client Config Snippet", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("UOS Launcher Snippet", EditorStyles.boldLabel);
             EditorGUILayout.LabelField(
-                "Paste into your MCP client (e.g. claude_desktop_config.json).",
+                "Use the local uos launcher from a terminal; explicit env is a fallback.",
                 EditorStyles.miniLabel);
 
-            string snippet = BuildClientConfigSnippet();
+            string snippet = BuildUosLauncherSnippet();
             using (var scroll = new EditorGUILayout.ScrollViewScope(_snippetScroll, GUILayout.Height(140f)))
             {
                 _snippetScroll = scroll.scrollPosition;
                 EditorGUILayout.TextArea(snippet, GUILayout.ExpandHeight(true));
             }
-            if (GUILayout.Button("Copy Config Snippet"))
+            if (GUILayout.Button("Copy UOS Snippet"))
             {
                 EditorGUIUtility.systemCopyBuffer = snippet;
             }
@@ -151,7 +163,7 @@ namespace Lyx.OhMyUnity.Editor
             {
                 ToolCallEntry entry = entries[i];
                 string time = entry.TimestampUtc.ToLocalTime().ToString("HH:mm:ss");
-                string line = $"[{time}] {entry.Tool} — {entry.Status}";
+                string line = $"[{time}] {entry.Tool} -> {entry.Status}";
                 if (!string.IsNullOrEmpty(entry.Detail)) line += $": {entry.Detail}";
                 EditorGUILayout.LabelField(line, StatusStyle(entry.Status));
             }
@@ -172,27 +184,40 @@ namespace Lyx.OhMyUnity.Editor
             return style;
         }
 
-        private static string BuildClientConfigSnippet()
+        internal static string BuildUosLauncherSnippet()
         {
-            string host = BridgeSettings.Host;
-            int port = BridgeSettings.Port;
+            string host = EditorBridgeServer.Host;
+            int port = EditorBridgeServer.Port;
             string token = BridgeSettings.Token;
+            ProjectInfoData info = BridgeProjectInfo.Create(host, port);
 
             var sb = new StringBuilder();
-            sb.AppendLine("{");
-            sb.AppendLine("  \"mcpServers\": {");
-            sb.AppendLine("    \"unity-conv-mcp\": {");
-            sb.AppendLine("      \"command\": \"npx\",");
-            sb.AppendLine("      \"args\": [\"-y\", \"@lyx/unity-conv-mcp-sidecar\"],");
-            sb.AppendLine("      \"env\": {");
-            sb.AppendLine($"        \"UNITY_MCP_HOST\": \"{host}\",");
-            sb.AppendLine($"        \"UNITY_MCP_PORT\": \"{port}\",");
-            sb.AppendLine($"        \"UNITY_MCP_TOKEN\": \"{token}\"");
-            sb.AppendLine("      }");
-            sb.AppendLine("    }");
-            sb.AppendLine("  }");
-            sb.Append("}");
+            sb.AppendLine("# Preferred local UOS flow");
+            sb.AppendLine("uos projects");
+            if (!string.IsNullOrEmpty(info.editorInstanceId))
+                sb.AppendLine($"uos --unity-project {PowerShellQuote(info.editorInstanceId)}");
+            else if (!string.IsNullOrEmpty(info.projectName))
+                sb.AppendLine($"uos --unity-project {PowerShellQuote(info.projectName)}");
+            else
+                sb.AppendLine("uos --unity-project <selector>");
+            sb.AppendLine();
+            sb.AppendLine("# Explicit bridge fallback for this Editor");
+            sb.AppendLine($"$env:UNITY_MCP_HOST = {PowerShellQuote(host)}");
+            sb.AppendLine($"$env:UNITY_MCP_PORT = {PowerShellQuote(port.ToString())}");
+            sb.AppendLine($"$env:UNITY_MCP_TOKEN = {PowerShellQuote(token)}");
+            if (!string.IsNullOrEmpty(info.projectPath))
+                sb.AppendLine($"$env:UOS_PROJECT_DIR = {PowerShellQuote(info.projectPath)}");
+            if (!string.IsNullOrEmpty(info.projectName))
+                sb.AppendLine($"$env:UOS_PROJECT_NAME = {PowerShellQuote(info.projectName)}");
+            if (!string.IsNullOrEmpty(info.editorInstanceId))
+                sb.AppendLine($"$env:UOS_EDITOR_INSTANCE_ID = {PowerShellQuote(info.editorInstanceId)}");
+            sb.Append("uos context");
             return sb.ToString();
+        }
+
+        private static string PowerShellQuote(string value)
+        {
+            return "'" + (value ?? string.Empty).Replace("'", "''") + "'";
         }
     }
 }

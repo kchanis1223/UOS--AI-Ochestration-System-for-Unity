@@ -23,10 +23,13 @@ namespace Lyx.OhMyUnity.Editor
         string AddElement(string screenId, IntentElementData element, UndoScope undo);
 
         /// <summary>Update properties / rect of an element addressed by canonical id.</summary>
-        bool UpdateElement(string elementId, NormRectData rect, string anchor, UndoScope undo);
+        bool UpdateElement(string elementId, NormRectData rect, string anchor, ElementProps props, UndoScope undo);
 
         /// <summary>Delete an element addressed by canonical id.</summary>
         bool DeleteElement(string elementId, UndoScope undo);
+
+        /// <summary>Activate one registered screen and deactivate the other registered screens.</summary>
+        bool SetActiveScreen(string screenId, UndoScope undo);
 
         /// <summary>List the screen ids currently in the scene.</summary>
         IReadOnlyList<string> ListScreens();

@@ -9,12 +9,12 @@ namespace Lyx.OhMyUnity.Editor
     /// <summary>
     /// Minimal RFC 6455 server-side WebSocket over a raw <see cref="TcpClient"/> stream. Unity's Mono
     /// HttpListener server-side WebSocket support is unreliable across platforms, so the bridge speaks
-    /// the framing directly. Only the subset the sidecar's `ws` client exercises is implemented:
+    /// the framing directly. Only the subset the UOS opencode tools exercise is implemented:
     /// the upgrade handshake, masked client text frames, unmasked server text frames, and the
     /// ping/pong/close control frames.
     ///
     /// This socket/runtime behavior is the human-verified boundary -- it cannot run headless. The
-    /// deterministic protocol (message shapes, handshake rules) is unit-tested on the sidecar side.
+    /// deterministic protocol (message shapes, handshake rules) is unit-tested on the UOS client side.
     /// </summary>
     internal sealed class WebSocketConnection : IDisposable
     {

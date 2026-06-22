@@ -2,17 +2,42 @@
   "$schema": "https://opencode.ai/config.json",
   "model": "anthropic/claude-opus-4-8",
   "small_model": "anthropic/claude-haiku-4-5",
-  "default_agent": "planner-to-screen",
+  "default_agent": "orchestrator",
+  "agent": {
+    "build": {
+      "disable": true
+    },
+    "plan": {
+      "disable": true
+    }
+  },
   "provider": {
     "anthropic": {}
   },
-  "plugin": [
-    "opencode-claude-auth@latest",
-    "file://./.opencode/plugins/uos.ts"
-  ],
   "permission": {
     "edit": "allow",
-    "bash": "ask",
+    "bash": {
+      "rg *": "allow",
+      "rg": "allow",
+      "Get-ChildItem *": "allow",
+      "Get-Content *": "allow",
+      "Select-String *": "allow",
+      "Test-Path *": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "bun test*": "allow",
+      "bun run test*": "allow",
+      "node --version": "allow",
+      "bun --version": "allow",
+      "opencode --version": "allow",
+      "uos doctor*": "allow",
+      "uos projects*": "allow",
+      "uos context*": "allow",
+      "uos ready*": "allow",
+      "*": "ask"
+    },
     "write": "allow",
     "webfetch": "ask",
     "read": "allow",

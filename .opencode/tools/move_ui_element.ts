@@ -1,5 +1,5 @@
 /**
- * move_ui_element — bridge proxy. Moves/resizes an existing element by its
+ * move_ui_element - bridge proxy. Moves/resizes an existing element by its
  * canonical elementId. rect is normalized 0..1.
  */
 import { tool } from "@opencode-ai/plugin";

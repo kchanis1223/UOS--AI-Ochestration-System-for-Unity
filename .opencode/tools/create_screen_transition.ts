@@ -1,5 +1,5 @@
 /**
- * create_screen_transition — bridge proxy. Creates a navigation transition
+ * create_screen_transition - bridge proxy. Creates a navigation transition
  * between two screens (panel toggle via ScreenFlowController).
  */
 import { tool } from "@opencode-ai/plugin";
@@ -16,8 +16,8 @@ export default tool({
   async execute(args) {
     const data = (await call("create_screen_transition", args)) as Record<string, unknown>;
     return {
-      title: `create_screen_transition: ${args.fromId} → ${args.toId}`,
-      output: `Created transition ${args.fromId} → ${args.toId} (trigger: ${args.trigger}).`,
+      title: `create_screen_transition: ${args.fromId} -> ${args.toId}`,
+      output: `Created transition ${args.fromId} -> ${args.toId} (trigger: ${args.trigger}).`,
       metadata: { ok: true, ...data },
     };
   },

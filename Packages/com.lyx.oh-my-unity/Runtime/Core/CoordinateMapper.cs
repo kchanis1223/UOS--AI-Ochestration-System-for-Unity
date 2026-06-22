@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Lyx.OhMyUnity
 {
     /// <summary>
-    /// Deterministic normalized&lt;-&gt;px coordinate mapping (decision E1). Mirrors the sidecar's
-    /// reference implementation (mcp-server/src/core/coordinates.ts) so both ends agree on the
+    /// Deterministic normalized&lt;-&gt;px coordinate mapping (decision E1). Mirrors the UOS tool layer's
+    /// reference implementation in the UOS opencode tool layer so both ends agree on the
     /// fidelity contract. Output px space is top-left origin (layout space); the RectTransform
     /// placement (pivot/anchor specifics) is applied by UguiBackend on top of this.
     /// Pure UnityEngine math, no UnityEditor dependency -> EditMode testable.

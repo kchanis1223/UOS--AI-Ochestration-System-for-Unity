@@ -35,7 +35,10 @@ namespace Lyx.OhMyUnity
         /// <summary>clientHintId of the parent within this same intent (empty for a root element).</summary>
         public string parentClientHintId;
 
-        /// <summary>One of: Panel, Text, Button, Image, InputField, Toggle, Slider, ScrollView, Dropdown.</summary>
+        /// <summary>Canonical parent element id for follow-up add_ui_element calls against an existing screen.</summary>
+        public string parentElementId;
+
+        /// <summary>One of: Panel, Text, Button, Image, InputField, Toggle, Slider, ScrollView, Dropdown, Video.</summary>
         public string type;
 
         public NormRectData rect;
@@ -68,8 +71,14 @@ namespace Lyx.OhMyUnity
     [Serializable]
     public class ElementProps
     {
-        /// <summary>Text label (Text content, Button label, InputField placeholder).</summary>
+        /// <summary>Text label (Text content, Button label, ScrollView body text, legacy InputField placeholder).</summary>
         public string text;
+
+        /// <summary>InputField placeholder text. Empty = use text/default.</summary>
+        public string placeholder;
+
+        /// <summary>InputField current text value. Empty = leave default/empty.</summary>
+        public string inputText;
 
         /// <summary>Foreground/background color as "#RRGGBB" or "#RRGGBBAA". Empty = leave default.</summary>
         public string color;
@@ -80,7 +89,64 @@ namespace Lyx.OhMyUnity
         /// <summary>Sprite asset path (e.g. "Assets/UI/btn.png"). Resolved via AssetDatabase.LoadAssetAtPath.</summary>
         public string sprite;
 
+        /// <summary>VideoClip asset path (e.g. "Assets/UOS/Videos/intro.mp4").</summary>
+        public string video;
+
         /// <summary>TextAnchor preset name (Left/Center/Right or MiddleCenter etc.). Empty = MiddleCenter default.</summary>
         public string align;
+
+        /// <summary>Unity FontStyle preset (Normal, Bold, Italic, BoldAndItalic). Empty = leave default.</summary>
+        public string fontStyle;
+
+        /// <summary>Numeric control value (Slider value or Dropdown selected index).</summary>
+        public float value;
+
+        /// <summary>True when value was explicitly supplied by the bridge client.</summary>
+        public bool hasValue;
+
+        /// <summary>Slider minimum value.</summary>
+        public float minValue;
+
+        /// <summary>True when minValue was explicitly supplied by the bridge client.</summary>
+        public bool hasMinValue;
+
+        /// <summary>Slider maximum value.</summary>
+        public float maxValue;
+
+        /// <summary>True when maxValue was explicitly supplied by the bridge client.</summary>
+        public bool hasMaxValue;
+
+        /// <summary>Toggle checked state.</summary>
+        public bool isOn;
+
+        /// <summary>True when isOn was explicitly supplied by the bridge client.</summary>
+        public bool hasIsOn;
+
+        /// <summary>Selectable control interactable state.</summary>
+        public bool interactable;
+
+        /// <summary>True when interactable was explicitly supplied by the bridge client.</summary>
+        public bool hasInteractable;
+
+        /// <summary>Dropdown option labels. Null/empty = leave existing/default options.</summary>
+        public string[] options;
+
+        /// <summary>VideoPlayer loop flag.</summary>
+        public bool loop;
+
+        /// <summary>True when loop was explicitly supplied by the bridge client.</summary>
+        public bool hasLoop;
+
+        /// <summary>VideoPlayer play-on-awake flag.</summary>
+        public bool playOnAwake;
+
+        /// <summary>True when playOnAwake was explicitly supplied by the bridge client.</summary>
+        public bool hasPlayOnAwake;
+
+        /// <summary>Video audio mute flag.</summary>
+        public bool muted;
+
+        /// <summary>True when muted was explicitly supplied by the bridge client.</summary>
+        public bool hasMuted;
     }
 }

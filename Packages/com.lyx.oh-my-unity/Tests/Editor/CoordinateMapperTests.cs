@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Lyx.OhMyUnity.Tests
 {
     /// <summary>
-    /// Mirrors mcp-server/test/coordinates.test.ts to keep the fidelity contract pinned on both sides.
+    /// Mirrors the UOS opencode coordinate tests to keep the fidelity contract pinned on both sides.
     /// </summary>
     [TestFixture]
     public sealed class CoordinateMapperTests

@@ -1,51 +1,38 @@
 /**
- * add_ui_element — bridge proxy. Adds a single element to an existing screen.
+ * add_ui_element - bridge proxy. Adds a single element to an existing screen.
  * Returns { elementId } (server-minted canonical id).
  */
 import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";
 import { call } from "./_bridge";
-
-// Normalized rect (0..1, top-left origin, referenceCanvas fraction).
-const RectSchema = z.object({
-  x: z.number().min(0).max(1),
-  y: z.number().min(0).max(1),
-  w: z.number().gt(0).max(1),
-  h: z.number().gt(0).max(1),
-});
-const ElementTypeEnum = z.enum([
-  "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown",
-]);
-// Mirrors create_ui_screen.ts ElementPropsSchema. See UguiBackend.ApplyProps for handling.
-const ElementPropsSchema = z.object({
-  text: z.string().optional(),
-  color: z.string().optional().describe("Hex color, '#RRGGBB' or '#RRGGBBAA'."),
-  fontSize: z.number().int().nonnegative().optional(),
-  sprite: z.string().optional().describe("Sprite asset path resolvable by AssetDatabase."),
-  align: z.string().optional().describe("Alignment preset name."),
-}).optional();
-
-const ElementSchema = z.object({
-  clientHintId: z.string().optional(),
-  parentClientHintId: z.string().optional(),
-  type: ElementTypeEnum,
-  rect: RectSchema,
-  anchor: z.string().optional(),
-  props: ElementPropsSchema,
-});
+import { AddElementSchema, normalizeAddElementForBridge, validateAddElement } from "./_planning_intent";
 
 export default tool({
-  description: "Add a single element to an existing screen. Returns { elementId } (server-minted canonical id).",
+  description: "Add a single element to an existing screen. Optionally pass element.parentElementId to parent it under an existing canonical element. Returns { elementId }.",
   args: {
     screenId: z.string(),
-    element: ElementSchema,
+    element: AddElementSchema,
   },
   async execute(args) {
-    const data = (await call("add_ui_element", args)) as { elementId: string };
+    const validation = validateAddElement(args.element);
+    if (!validation.ok) {
+      return {
+        title: "add_ui_element: preflight failed",
+        output: `preflight failed:\n${validation.errors.map((e) => `  - ${e}`).join("\n")}`,
+        metadata: { ok: false, errors: validation.errors, warnings: validation.warnings },
+      };
+    }
+    const data = (await call("add_ui_element", {
+      ...args,
+      element: normalizeAddElementForBridge(args.element),
+    })) as { elementId: string };
+    const warningText = validation.warnings.length > 0
+      ? `\n\nWarnings:\n${validation.warnings.map((w) => `- ${w}`).join("\n")}`
+      : "";
     return {
-      title: `add_ui_element: ${args.element.type} → ${data.elementId}`,
-      output: `Added ${args.element.type} (id=${data.elementId}) to screen ${args.screenId}.`,
-      metadata: { ok: true, ...data },
+      title: `add_ui_element: ${args.element.type} -> ${data.elementId}`,
+      output: `Added ${args.element.type} (id=${data.elementId}) to screen ${args.screenId}.` + warningText,
+      metadata: { ok: true, warnings: validation.warnings, ...data },
     };
   },
 });

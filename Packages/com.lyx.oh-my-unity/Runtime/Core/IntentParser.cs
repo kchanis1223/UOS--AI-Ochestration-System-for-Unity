@@ -10,15 +10,15 @@ namespace Lyx.OhMyUnity
 
     /// <summary>
     /// Defense-in-depth validation/normalization of a PlanningIntentData on the Unity side,
-    /// mirroring the sidecar's schema + tree checks (mcp-server/src/core/intentValidation.ts and
-    /// schema.ts). Even though the sidecar preflights, the server validates again before mutating
-    /// the scene. Pure C#, no Unity dependency -> EditMode testable.
+    /// mirroring the UOS opencode tool schema + tree checks. Even though the tool layer preflights,
+    /// the server validates again before mutating the scene. Pure C#, no Unity dependency ->
+    /// EditMode testable.
     /// </summary>
     public static class IntentParser
     {
         private static readonly HashSet<string> AllowedTypes = new HashSet<string>
         {
-            "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown",
+            "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown", "Video",
         };
 
         public static IntentValidationResult Validate(PlanningIntentData intent)

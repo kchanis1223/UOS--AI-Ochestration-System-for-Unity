@@ -3,7 +3,8 @@
   "rootNamespace": "Lyx.OhMyUnity.Editor",
   "references": [
     "Lyx.OhMyUnity.Runtime",
-    "UnityEngine.UI"
+    "UnityEngine.UI",
+    "UnityEngine.VideoModule"
   ],
   "includePlatforms": [
     "Editor"

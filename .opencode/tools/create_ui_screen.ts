@@ -1,5 +1,5 @@
 /**
- * create_ui_screen — bridge proxy. Generates a Unity UI screen (Canvas + element
+ * create_ui_screen - bridge proxy. Generates a Unity UI screen (Canvas + element
  * tree) from a PlanningIntent. Server mints canonical IDs and returns mapping
  * { screenId, elements: [{ clientHintId, elementId }] }.
  *
@@ -12,91 +12,43 @@
 import { tool } from "@opencode-ai/plugin";
 import { z } from "zod";
 import { call } from "./_bridge";
+import { normalizeIntentForBridge, PlanningIntentSchema, validatePlanningIntent } from "./_planning_intent";
 
-// Normalized rect (0..1 fraction of referenceCanvas, top-left origin).
-// Mirrors IntentParser.ValidateRect on the Unity side so violations are
-// caught client-side before the round-trip rather than silent off-screen.
-const RectSchema = z.object({
-  x: z.number().min(0).max(1).describe("Normalized x (0..1) relative to referenceCanvas, top-left origin."),
-  y: z.number().min(0).max(1).describe("Normalized y (0..1) relative to referenceCanvas, top-left origin."),
-  w: z.number().gt(0).max(1).describe("Normalized width (0,1] relative to referenceCanvas."),
-  h: z.number().gt(0).max(1).describe("Normalized height (0,1] relative to referenceCanvas."),
-});
-
-const ElementTypeEnum = z.enum([
-  "Panel", "Text", "Button", "Image", "InputField", "Toggle", "Slider", "ScrollView", "Dropdown",
-]);
-
-// Explicit, JsonUtility-compatible style/content props. Free-form dictionaries
-// were silently discarded by the Unity backend (see docs/feedback/2026-06-02-e2e-jangheung.md Top #1).
-// Per-type interpretation lives in UguiBackend.ApplyProps:
-//   Text       — text / fontSize / color / align
-//   Button     — color (background) / text (label) / sprite
-//   Image|Panel — color / sprite
-//   InputField — text (placeholder) / color
-const ElementPropsSchema = z.object({
-  text: z.string().optional().describe("Text content / Button label / InputField placeholder."),
-  color: z.string().optional().describe("Hex color, '#RRGGBB' or '#RRGGBBAA'."),
-  fontSize: z.number().int().nonnegative().optional().describe("Text font size in pt (0 = leave default)."),
-  sprite: z.string().optional().describe("Sprite asset path resolvable by AssetDatabase, e.g. 'Assets/UI/btn.png'."),
-  align: z.string().optional().describe("Alignment: Left / Center / Right / TopLeft / MiddleCenter / etc. (default MiddleCenter)."),
-}).optional();
-
-const ElementSchema: z.ZodTypeAny = z.object({
-  clientHintId: z.string().describe("Advisory client id; authoritative only for intra-call parent linkage.").optional(),
-  parentClientHintId: z.string().describe("clientHintId of the parent element within this same intent.").optional(),
-  type: ElementTypeEnum,
-  rect: RectSchema,
-  anchor: z.string().optional(),
-  props: ElementPropsSchema,
-});
-
-const PlanningIntentSchema = z.object({
-  version: z.literal("1.0.0"),
-  screenName: z.string(),
-  referenceCanvas: z.object({ width: z.number(), height: z.number() }),
-  elements: z.array(ElementSchema),
-});
-
-function validateIntentTree(intent: z.infer<typeof PlanningIntentSchema>): string[] {
-  const errors: string[] = [];
-  const ids = new Set<string>();
-  for (const el of intent.elements) {
-    if (el.clientHintId !== undefined) {
-      if (ids.has(el.clientHintId)) {
-        errors.push(`duplicate clientHintId: ${el.clientHintId}`);
-      }
-      ids.add(el.clientHintId);
-    }
-  }
-  for (const el of intent.elements) {
-    if (el.parentClientHintId !== undefined && !ids.has(el.parentClientHintId)) {
-      errors.push(`parentClientHintId "${el.parentClientHintId}" not found in intent`);
-    }
-  }
-  return errors;
-}
+const ScreenSourceSchema = z.object({
+  tool: z.string().optional().describe("Tool or workflow that produced the draft/source, e.g. draft_planning_intent_from_document."),
+  kind: z.string().optional().describe("Source kind such as image, pdf, docx, pptx, md, txt, or document."),
+  mode: z.string().optional().describe("Optional source mode, e.g. rendered or editable."),
+  path: z.string().optional().describe("Original local material path when known."),
+  pageNumber: z.number().int().positive().optional().describe("1-based PDF page number when applicable."),
+  slideNumber: z.number().int().positive().optional().describe("1-based PPTX slide number when applicable."),
+  imageNumber: z.number().int().positive().optional().describe("1-based embedded image number when applicable."),
+  packagePath: z.string().optional().describe("Office package media path when applicable."),
+  renderedPath: z.string().optional().describe("Rendered page/slide image path when applicable."),
+  extractedPath: z.string().optional().describe("Extracted embedded image path when applicable."),
+  assetPaths: z.array(z.string()).max(500).optional().describe("Unity asset paths imported for this screen, when applicable."),
+}).strict();
 
 export default tool({
   description:
-    "Generate a Unity UI screen (Canvas + element tree) from a PlanningIntent. Returns { screenId, elements: [{ clientHintId, elementId }] } with server-minted canonical ids. clientHintId is advisory and authoritative only for intra-call parent linkage.",
+    "Generate a Unity UI screen (Canvas + element tree) from a PlanningIntent. Returns { screenId, elements: [{ clientHintId, elementId }] } with server-minted canonical ids. clientHintId is advisory and authoritative only for intra-call parent linkage. Optional source metadata is persisted only in UOS context and is not sent to Unity.",
   args: {
     intent: PlanningIntentSchema,
+    source: ScreenSourceSchema.optional().describe("Optional material/source metadata to persist in .uos for follow-up sessions. Pass metadata.source from draft tools when available."),
   },
   async execute(args) {
-    const treeErrors = validateIntentTree(args.intent);
-    if (treeErrors.length > 0) {
+    const validation = validatePlanningIntent(args.intent);
+    if (!validation.ok) {
       return {
         title: "create_ui_screen: preflight failed",
-        output: `preflight failed:\n${treeErrors.map((e) => `  - tree: ${e}`).join("\n")}`,
-        metadata: { ok: false, errors: treeErrors },
+        output: `preflight failed:\n${validation.errors.map((e) => `  - ${e}`).join("\n")}`,
+        metadata: { ok: false, errors: validation.errors, warnings: validation.warnings },
       };
     }
-    const data = (await call("create_ui_screen", { intent: args.intent })) as {
+    const data = (await call("create_ui_screen", { intent: normalizeIntentForBridge(args.intent) })) as {
       screenId: string;
       elements: Array<{ clientHintId?: string; elementId: string }>;
     };
-    // Surface the clientHintId→elementId mapping in the output text — agents need
+    // Surface the clientHintId -> elementId mapping in the output text; agents need
     // the canonical elementIds for subsequent update/move/delete/transition calls
     // and previously had to re-query get_scene_hierarchy.
     const mappingRows = data.elements
@@ -106,12 +58,16 @@ export default tool({
       data.elements.length > 0
         ? `\n\n| # | clientHintId | elementId |\n|---|---|---|\n${mappingRows}`
         : "";
+    const warningText = validation.warnings.length > 0
+      ? `\n\nWarnings:\n${validation.warnings.map((w) => `- ${w}`).join("\n")}`
+      : "";
     return {
-      title: `create_ui_screen: ${args.intent.screenName} → ${data.screenId}`,
+      title: `create_ui_screen: ${args.intent.screenName} -> ${data.screenId}`,
       output:
         `Created screen "${args.intent.screenName}" (id=${data.screenId}) with ${data.elements.length} element(s).` +
-        mappingTable,
-      metadata: { ok: true, ...data },
+        mappingTable +
+        warningText,
+      metadata: { ok: true, warnings: validation.warnings, source: args.source, ...data },
     };
   },
 });
