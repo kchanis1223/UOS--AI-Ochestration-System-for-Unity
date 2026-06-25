@@ -1,4 +1,4 @@
-# UOS Orchestrator Rework Tasks
+# UOS Ochestrator Rework Tasks
 
 Progress legend:
 
@@ -8,13 +8,14 @@ Progress legend:
 
 ## Progress Snapshot
 
-- Overall: 12 / 12 orchestrator task groups complete; 6 / 6 launcher UX
-  implementation tasks complete.
-- Current focus: user-led validation of the common
-  `ProductionBlueprint -> Plan -> Build -> Editor -> Verify` flow against real
-  configured Unity projects.
-- Next implementation task: user-led live validation of the launcher and
-  blueprint approval flow in the real terminal and Unity environment.
+- Overall: 12 / 12 Ochestrator task groups complete; 6 / 6 terminal launcher
+  UX tasks complete; GUI workbench v1 is in implementation.
+- Current focus: browser GUI workbench validation for project selection,
+  headless Ochestrator chat, file attachment, Blueprint approval, and activity
+  review.
+- Next implementation task: user-led live validation of `uos` opening the GUI
+  and driving a real Unity project through the common
+  `ProductionBlueprint -> Plan -> Build -> Editor -> Verify` flow.
 
 ## Task 1 - Mode Foundation
 
@@ -29,40 +30,40 @@ any internal submodel handoff or Unity mutation begins.
 - `[x]` Add selector tests.
 - `[x]` Add PRD/rework docs.
 - `[x]` Decide CLI/debug command is optional; opencode tool is enough for the
-  first Orchestrator pass.
+  first Ochestrator pass.
 
 Artifacts:
 
 - `bin/mode-core.js`
 - `.opencode/tools/select_uos_mode.ts`
 - `tests/uos-modes.test.ts`
-- `docs/uos-orchestrator-prd.md`
-- `docs/uos-orchestrator-rework.md`
+- `docs/uos-ochestrator-prd.md`
+- `docs/uos-ochestrator-rework.md`
 
 Verification:
 
 - `bun run test` passes.
 
-## Task 2 - Orchestrator Agent
+## Task 2 - Ochestrator Agent
 
 Status: `[x]`
 
-Goal: introduce a top-level Orchestrator prompt that becomes the normal user
+Goal: introduce a top-level Ochestrator prompt that becomes the normal user
 conversation surface.
 
-- `[x]` Add `.opencode/agents/orchestrator.md`.
+- `[x]` Add `.opencode/agents/ochestrator.md`.
 - `[x]` Require `get_uos_context` and `select_uos_mode` near session start.
 - `[x]` Define delegation rules for internal submodel modes.
 - `[x]` Define approval points before broad build/mutation.
 - `[x]` Update launcher default agent from `planner-to-screen` to
-  `orchestrator` once prompt is ready.
+  `ochestrator` once prompt is ready.
 - `[x]` Remove direct specialist invocation from the user-facing UOS path;
-  `orchestrator` is the only supported UOS agent.
-- `[x]` Add Orchestrator prompt tests.
+  `ochestrator` is the only supported UOS agent.
+- `[x]` Add Ochestrator prompt tests.
 
 Verification:
 
-- `[x]` Prompt tests confirm Orchestrator requires context, mode selection, Editor
+- `[x]` Prompt tests confirm Ochestrator requires context, mode selection, Editor
   boundary, and progress reporting.
 - `[x]` Existing material-to-screen tests still pass after default-agent switch.
 
@@ -81,11 +82,11 @@ screen work.
 - `[x]` Remove top-level orchestration language from the specialist prompt.
 - `[x]` Keep material reading, PlanningIntent drafting, UI creation, preview,
   and repair guidance.
-- `[x]` Ensure Orchestrator can hand off screen tasks to it internally.
+- `[x]` Ensure Ochestrator can hand off screen tasks to it internally.
 
 Verification:
 
-- `[x]` Prompt tests distinguish Orchestrator responsibilities from internal
+- `[x]` Prompt tests distinguish Ochestrator responsibilities from internal
   submodel responsibilities.
 
 ## Task 4 - Plan/Build/Editor Artifact Contract
@@ -184,20 +185,20 @@ Artifacts:
 
 - `bin/editor-batch-core.js`
 - `tests/editor-batch.test.ts`
-- `.opencode/agents/orchestrator.md`
-- `docs/uos-orchestrator-rework.md`
+- `.opencode/agents/ochestrator.md`
+- `docs/uos-ochestrator-rework.md`
 
 ## Task 8 - Progress Reporting And Resume
 
 Status: `[x]`
 
-Goal: make Orchestrator progress visible, resumable, and useful for iterative
+Goal: make Ochestrator progress visible, resumable, and useful for iterative
 improvement.
 
 - `[x]` Define `.uos` progress records for current task/mode/plan/build state.
 - `[x]` Add progress summary formatting.
 - `[x]` Include mode, current step, completed steps, evidence, and blockers.
-- `[x]` Update `get_uos_context` to surface active Orchestrator progress.
+- `[x]` Update `get_uos_context` to surface active Ochestrator progress.
 - `[x]` Add tests for persisted progress.
 
 Verification:
@@ -207,8 +208,8 @@ Verification:
 
 Artifacts:
 
-- `bin/orchestrator-progress-core.js`
-- `tests/orchestrator-progress.test.ts`
+- `bin/ochestrator-progress-core.js`
+- `tests/ochestrator-progress.test.ts`
 - `.opencode/tools/_uos_context.ts`
 - `tests/uos-context.test.ts`
 
@@ -216,7 +217,7 @@ Artifacts:
 
 Status: `[x]`
 
-Goal: allow the Orchestrator inside opencode to list connected Unity projects
+Goal: allow the Ochestrator inside opencode to list connected Unity projects
 and switch the active edit target before applying Editor commands.
 
 - `[x]` Define a session target state that can override launcher-selected env.
@@ -226,7 +227,7 @@ and switch the active edit target before applying Editor commands.
 - `[x]` Make `get_uos_context` load the selected project's `.uos` context after
   switching.
 - `[x]` Make the UOS journaling plugin write to the active selected project.
-- `[x]` Update Orchestrator guidance.
+- `[x]` Update Ochestrator guidance.
 - `[x]` Run tests and fix regressions.
 
 Verification:
@@ -246,14 +247,14 @@ Artifacts:
 - `tests/unity-target-selection.test.ts`
 - `tests/uos-context.test.ts`
 
-## Task 10 - Orchestrator-Only User Agent Surface
+## Task 10 - Ochestrator-Only User Agent Surface
 
 Status: `[x]`
 
 Goal: make the user-facing opencode agent surface match the target
-`Orchestrator -> internal submodels -> Editor` architecture.
+`Ochestrator -> internal submodels -> Editor` architecture.
 
-- `[x]` Keep only `.opencode/agents/orchestrator.md` as a UOS opencode agent.
+- `[x]` Keep only `.opencode/agents/ochestrator.md` as a UOS opencode agent.
 - `[x]` Move material-to-screen guidance out of `.opencode/agents/` and into
   `.opencode/submodels/material-understanding.md` plus
   `.opencode/submodels/ui-screen-builder.md`.
@@ -264,18 +265,18 @@ Goal: make the user-facing opencode agent surface match the target
 - `[x]` Add `handoffFile` metadata to mode registry entries.
 - `[x]` Update `select_uos_mode` output to show internal submodels, optional
   recipe, and primary handoff file.
-- `[x]` Normalize UOS opencode launches to `--agent orchestrator`, even when a
+- `[x]` Normalize UOS opencode launches to `--agent ochestrator`, even when a
   custom `--agent` is supplied.
 - `[x]` Disable opencode native `build` and `plan` primary agents in
-  `opencode.json` so Tab-based agent switching exposes only `orchestrator`.
+  `opencode.json` so Tab-based agent switching exposes only `Ochestrator`.
 - `[x]` Update docs/tests to describe Plan and Build as artifacts, not
   user-selectable agents.
 
 Verification:
 
-- `[x]` Unit tests confirm only Orchestrator remains in `.opencode/agents`.
+- `[x]` Unit tests confirm only Ochestrator remains in `.opencode/agents`.
 - `[x]` Launcher tests confirm custom `--agent` inputs are normalized to
-  `orchestrator`.
+  `Ochestrator`.
 - `[x]` `opencode agent list` confirms `build` and `plan` are no longer exposed
   in this project config.
 
@@ -301,7 +302,7 @@ Task breakdown:
 
 - `[x]` Task 1 - Save Unity project discovery roots during setup.
   - Add `uos setup --unity-projects <dir>`.
-  - Add `uos setup --language <code|name>` for default Orchestrator response
+  - Add `uos setup --language <code|name>` for default Ochestrator response
     language.
   - Store roots in `~/.config/uos/config.json`.
   - Add setup parser/config tests.
@@ -320,7 +321,7 @@ Task breakdown:
   - Arrow keys and Enter select a project.
   - Mouse click selects a row/action where terminal mouse input is available.
   - Provide keyboard fallback for all actions.
-- `[x]` Task 6 - Enter selected project's opencode Orchestrator session.
+- `[x]` Task 6 - Enter selected project's opencode Ochestrator session.
   - Inject selected Unity/project env.
   - If disconnected, guide or perform connect action before mutation.
 
@@ -338,7 +339,7 @@ Implementation notes:
   clicking a project row enters the project, clicking the status/action column
   toggles connect/disconnect.
 - `UOS_SIMPLE_PROJECT_SELECT=1` keeps the plain numeric prompt fallback.
-- Disconnected project entry is allowed; the Orchestrator startup prompt
+- Disconnected project entry is allowed; the Ochestrator startup prompt
   receives project status, UOS package status, and live bridge status so it can
   avoid mutation before connection.
 
@@ -356,7 +357,7 @@ Artifacts so far:
 Status: `[x]`
 
 Goal: define the seven active functional submodels in enough detail that the
-Orchestrator can route work, compose recipes, request approval, and produce
+Ochestrator can route work, compose recipes, request approval, and produce
 consistent artifacts without exposing submodels as user-selectable agents.
 
 Active submodels:
@@ -389,19 +390,19 @@ Working document:
 
 Status: `[x]`
 
-Goal: connect the `ProductionBlueprint` contract to the actual Orchestrator
+Goal: connect the `ProductionBlueprint` contract to the actual Ochestrator
 tooling, resume context, and Plan/Build source metadata without changing the
 small-edit fast path.
 
 - `[x]` Add persisted ProductionBlueprint helper functions.
 - `[x]` Add read/write/list/latest/summary behavior for
-  `.uos/orchestrator/blueprints`.
+  `.uos/ochestrator/blueprints`.
 - `[x]` Add `draft_production_blueprint` opencode tool for validation and
   planner-friendly artifact summaries.
-- `[x]` Add optional `blueprint` references to `OrchestratorProgress`.
+- `[x]` Add optional `blueprint` references to `OchestratorProgress`.
 - `[x]` Surface latest/active blueprint summaries through `get_uos_context`.
 - `[x]` Add invalid blueprint blockers to context output.
-- `[x]` Define broad-work criteria and small-edit fast path in Orchestrator
+- `[x]` Define broad-work criteria and small-edit fast path in Ochestrator
   guidance.
 - `[x]` Standardize blueprint approval choices.
 - `[x]` Carry `source.blueprintId` and `source.blueprintPath` through kiosk

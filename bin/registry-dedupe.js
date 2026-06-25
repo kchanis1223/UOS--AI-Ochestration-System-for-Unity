@@ -25,15 +25,19 @@ function parseTime(value) {
 
 /** True when entry `a` is a better representative of its project than `b`. */
 export function isPreferredEditor(a, b) {
-  // 1) Prefer an entry that reports a UOS package version (a fully loaded bridge).
+  // 1) Prefer an entry launched by the GUI session when present.
+  const ga = a?.uosGuiSessionId ? 1 : 0;
+  const gb = b?.uosGuiSessionId ? 1 : 0;
+  if (ga !== gb) return ga > gb;
+  // 2) Prefer an entry that reports a UOS package version (a fully loaded bridge).
   const ua = a?.uosPackageVersion ? 1 : 0;
   const ub = b?.uosPackageVersion ? 1 : 0;
   if (ua !== ub) return ua > ub;
-  // 2) Prefer the most recently published entry.
+  // 3) Prefer the most recently published entry.
   const ta = parseTime(a?.updatedAtUtc);
   const tb = parseTime(b?.updatedAtUtc);
   if (ta !== tb) return ta > tb;
-  // 3) Stable: keep the first one seen.
+  // 4) Stable: keep the first one seen.
   return false;
 }
 

@@ -5,7 +5,7 @@
 Inspect selected Unity project state, bridge readiness, screens, hierarchy,
 scene objects, and persisted UOS context without mutating Unity.
 
-It is not a user-selectable opencode agent. The Orchestrator owns user
+It is not a user-selectable opencode agent. The Ochestrator owns user
 conversation, target choice, and progress reporting.
 
 This submodel is the read-only baseline for UOS. Use it before mutation when the
@@ -73,7 +73,7 @@ Use this minimum artifact shape:
     "activeScreenId": "",
     "screenCount": 0,
     "sceneObjectCount": 0,
-    "activeOrchestratorProgress": false
+    "activeOchestratorProgress": false
   },
   "screens": [],
   "hierarchy": {
@@ -134,7 +134,7 @@ Rules:
 - `editing=blocked`: required write tools are missing or capability probe failed.
 
 Inspection may succeed while editing is blocked. Report that distinction
-clearly to the Orchestrator.
+clearly to the Ochestrator.
 
 ## Allowed Tools
 
@@ -165,7 +165,7 @@ Forbidden in this submodel:
 2. Use `list_unity_projects` if the target is unclear or the user asks what is
    connected.
 3. Use `select_unity_project` only when the user chooses a target or when the
-   Orchestrator has an explicit selector.
+   Ochestrator has an explicit selector.
 4. Reload `get_uos_context` after target switches.
 5. Use `get_project_info` to confirm bridge identity and capability metadata
    when a live bridge exists.
@@ -177,13 +177,13 @@ Forbidden in this submodel:
 ## Approval Gates
 
 No approval is required for read-only inspection. If inspection turns into an
-edit request, return to the Orchestrator for mode selection and mutation
+edit request, return to the Ochestrator for mode selection and mutation
 approval.
 
 Explicit user choice is required before switching targets when multiple live
 Unity projects are possible or when the requested selector is ambiguous.
 
-Explicit Orchestrator approval is required before any later mutation uses the
+Explicit Ochestrator approval is required before any later mutation uses the
 inspection result as its target context.
 
 ## Evidence
@@ -200,7 +200,7 @@ Do not record or echo bridge tokens.
 
 ## Failure Handling
 
-Stop and return a blocker to the Orchestrator when:
+Stop and return a blocker to the Ochestrator when:
 
 - no live Unity bridge is found and the task requires live inspection,
 - target selection is ambiguous,

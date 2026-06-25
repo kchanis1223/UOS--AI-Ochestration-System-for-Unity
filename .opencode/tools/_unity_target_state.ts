@@ -20,7 +20,7 @@ export interface UnityTargetEntry {
 export interface ActiveUnityTargetState {
   version: string;
   selectedAt: string;
-  source: "env" | "session";
+  source: "env" | "session" | "gui";
   target: UnityTargetEntry;
   stateFile?: string;
 }
@@ -35,7 +35,7 @@ export function unityTargetStateFile(
     ?? (stringValue(env.UOS_PROJECT_DIR) !== undefined
       ? path.join(stringValue(env.UOS_PROJECT_DIR) as string, ".uos")
       : path.join(cwd, ".uos"));
-  return path.join(contextDir, "orchestrator", "unity-target-session.json");
+  return path.join(contextDir, "ochestrator", "unity-target-session.json");
 }
 
 export async function readActiveUnityTarget(options: {
@@ -44,6 +44,10 @@ export async function readActiveUnityTarget(options: {
   stateFile?: string;
 } = {}): Promise<ActiveUnityTargetState | undefined> {
   const env = options.env ?? processEnv();
+  const guiConnectionFile = stringValue(env.UOS_GUI_CONNECTION_FILE);
+  if (guiConnectionFile !== undefined) {
+    return await readGuiConnectionTarget(guiConnectionFile);
+  }
   const stateFile = options.stateFile ?? unityTargetStateFile(env, options.cwd);
   try {
     const parsed = JSON.parse(await fs.readFile(stateFile, "utf8")) as unknown;
@@ -65,6 +69,31 @@ export async function readActiveUnityTarget(options: {
   return envTarget !== undefined
     ? { version: STATE_VERSION, selectedAt: "", source: "env", target: envTarget }
     : undefined;
+}
+
+async function readGuiConnectionTarget(connectionFile: string): Promise<ActiveUnityTargetState | undefined> {
+  try {
+    const parsed = JSON.parse(await fs.readFile(path.resolve(connectionFile), "utf8")) as any;
+    if (parsed?.status !== "connected") return undefined;
+    const target = normalizeUnityTarget({
+      instanceId: parsed.editorInstanceId,
+      projectName: parsed.projectName,
+      projectPath: parsed.projectPath,
+      host: parsed.host,
+      port: parsed.port,
+      token: parsed.token,
+    });
+    if (target === undefined) return undefined;
+    return {
+      version: stringValue(parsed.version) ?? STATE_VERSION,
+      selectedAt: stringValue(parsed.lastVerifiedAt) ?? stringValue(parsed.updatedAt) ?? "",
+      source: "gui",
+      target,
+      stateFile: path.resolve(connectionFile),
+    };
+  } catch {
+    return undefined;
+  }
 }
 
 export async function writeActiveUnityTarget(

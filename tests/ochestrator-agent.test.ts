@@ -1,21 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import { readdir } from "node:fs/promises";
 
-const promptFile = new URL("../.opencode/agents/orchestrator.md", import.meta.url);
+const promptFile = new URL("../.opencode/agents/ochestrator.md", import.meta.url);
 const agentsDir = new URL("../.opencode/agents/", import.meta.url);
 const opencodeConfigFile = new URL("../opencode.json", import.meta.url);
 
-describe("UOS Orchestrator agent prompt", () => {
-  test("keeps Orchestrator as the only user-facing UOS agent", async () => {
+describe("UOS Ochestrator agent prompt", () => {
+  test("keeps Ochestrator as the only user-facing UOS agent", async () => {
     const agents = (await readdir(agentsDir))
       .filter((name) => name.endsWith(".md"))
       .sort();
-    expect(agents).toEqual(["orchestrator.md"]);
+    expect(agents).toEqual(["ochestrator.md"]);
   });
 
   test("disables opencode native Build and Plan primary agents", async () => {
     const config = await Bun.file(opencodeConfigFile).json();
-    expect(config.default_agent).toBe("orchestrator");
+    expect(config.default_agent).toBe("ochestrator");
     expect(config.agent?.build?.disable).toBe(true);
     expect(config.agent?.plan?.disable).toBe(true);
   });
@@ -45,9 +45,9 @@ describe("UOS Orchestrator agent prompt", () => {
     expect(prompt).toContain("Do not mutate Unity until the selected target and intent are clear");
   });
 
-  test("documents Orchestrator, internal submodel, Plan, Build, and Editor boundaries", async () => {
+  test("documents Ochestrator, internal submodel, Plan, Build, and Editor boundaries", async () => {
     const prompt = await Bun.file(promptFile).text();
-    expect(prompt).toContain("Orchestrator: intent, mode choice");
+    expect(prompt).toContain("Ochestrator: intent, mode choice");
     expect(prompt).toContain("Internal submodel: reusable functional capability");
     expect(prompt).toContain("Recipe: a specific content workflow/menu");
     expect(prompt).toContain("not the common pipeline itself");
@@ -173,10 +173,10 @@ describe("UOS Orchestrator agent prompt", () => {
     expect(prompt).toContain("whether the scene/project was saved");
   });
 
-  test("keeps general-editor as fallback executor instead of fallback orchestrator", async () => {
+  test("keeps general-editor as fallback executor instead of fallback Ochestrator", async () => {
     const prompt = await Bun.file(promptFile).text();
     expect(prompt).toContain("constrained fallback executor");
-    expect(prompt).toContain("Orchestrator still owns routing");
+    expect(prompt).toContain("Ochestrator still owns routing");
     expect(prompt).toContain("Do not delegate routing, ambiguity reduction, or next-submodel decisions");
     expect(prompt).toContain("Provide the fallback reason and excluded specialist submodels");
     expect(prompt).toContain("candidate for a new submodel or");
@@ -199,11 +199,11 @@ describe("UOS Orchestrator agent prompt", () => {
     expect(prompt).toContain("build_kiosk_from_plan");
   });
 
-  test("uses persisted OrchestratorProgress for resumed sessions", async () => {
+  test("uses persisted OchestratorProgress for resumed sessions", async () => {
     const prompt = await Bun.file(promptFile).text();
-    expect(prompt).toContain("activeOrchestratorProgress");
-    expect(prompt).toContain(".uos/orchestrator/progress.json");
-    expect(prompt).toContain("OrchestratorProgress");
+    expect(prompt).toContain("activeOchestratorProgress");
+    expect(prompt).toContain(".uos/ochestrator/progress.json");
+    expect(prompt).toContain("OchestratorProgress");
     expect(prompt).toContain("get_uos_context");
     expect(prompt).toContain("resume from that");
   });

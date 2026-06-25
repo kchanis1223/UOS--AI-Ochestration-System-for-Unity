@@ -94,6 +94,36 @@ The `.opencode` install is required for auto-discovered opencode plugins such
 as `claude-auth.ts`, which wraps `opencode-claude-auth` for Claude OAuth
 sessions. After `bun link`, `uos` should be available in a new terminal.
 
+## Launch The GUI Workbench
+
+The default user-facing entry is now the local browser GUI:
+
+```bash
+uos
+```
+
+This starts a local backend on `127.0.0.1`, opens the browser workbench, and
+keeps Unity project selection, file attachment, Ochestrator chat,
+ProductionBlueprint approval, and activity logs out of the terminal. The
+developer terminal TUI is still available when needed:
+
+For GUI Chat, open Unity from the Projects tab with `Open Unity` and wait for
+`Connected`. The GUI uses only its own `.uos/gui/connection.json` session;
+Unity Editors opened outside the GUI are shown as external and are not used for
+GUI Chat.
+
+```bash
+uos chat
+uos tui
+UOS_DISABLE_GUI=1 uos
+```
+
+Build the GUI assets after changing files in `gui/`:
+
+```bash
+bun run gui:build
+```
+
 ## Install The Unity Package Into A Target Project
 
 For a consumer Unity project, let UOS embed its package into
@@ -305,10 +335,10 @@ When persisted `.uos` context exists, that summary also surfaces screen count,
 the active screen, latest verification or preview status, and material
 candidate count before the TUI starts.
 UOS starts opencode from this repository root and always injects
-`--agent orchestrator` for `uos run ...` and default TUI launches. User-facing
+`--agent ochestrator` for `uos run ...` and default TUI launches. User-facing
 UOS sessions do not support choosing specialist agents directly. `opencode.json`
 also disables opencode's native `build` and `plan` primary agents so Tab-based
-agent switching only exposes `orchestrator` after relaunch. The Orchestrator is
+agent switching only exposes `ochestrator` after relaunch. The Ochestrator is
 the only conversational agent: it calls `get_uos_context`, selects a UOS mode
 with `select_uos_mode`, uses internal submodel handoff documents under
 `.opencode/submodels/`, and keeps Unity mutations behind the Editor bridge
@@ -584,7 +614,7 @@ The setup command links this repo's `.opencode/agents`, `.opencode/tools`, and
 dependencies into the global opencode `package.json`, and runs
 `npm install --ignore-scripts` there when dependencies are missing or changed.
 Because the config copy includes `default_agent` and disabled native agents,
-direct opencode launches outside this repository keep the same Orchestrator-only
+direct opencode launches outside this repository keep the same Ochestrator-only
 agent surface after setup.
 Pass `--unity-projects <dir>` to save the folder that contains user Unity
 projects in `~/.config/uos/config.json`; the launcher project list will use that

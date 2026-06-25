@@ -26,12 +26,12 @@ describe("kiosk build command generation", () => {
 
     const plan = await planKioskStructure(root, {
       blueprintId: "blueprint-kiosk-main",
-      blueprintPath: "D:/Unity/MyGame/.uos/orchestrator/blueprints/blueprint-kiosk-main.json",
+      blueprintPath: "D:/Unity/MyGame/.uos/ochestrator/blueprints/blueprint-kiosk-main.json",
     });
     expect(plan.source).toMatchObject({
       tool: "plan_kiosk_structure",
       blueprintId: "blueprint-kiosk-main",
-      blueprintPath: "D:/Unity/MyGame/.uos/orchestrator/blueprints/blueprint-kiosk-main.json",
+      blueprintPath: "D:/Unity/MyGame/.uos/ochestrator/blueprints/blueprint-kiosk-main.json",
     });
 
     const result = buildKioskEditorChangeSet(plan, { planId: "kiosk-plan-test" });
@@ -46,13 +46,13 @@ describe("kiosk build command generation", () => {
       recipeFile: ".opencode/recipes/kiosk.md",
       recipeGuardVersion: "1.0.0",
       blueprintId: "blueprint-kiosk-main",
-      blueprintPath: "D:/Unity/MyGame/.uos/orchestrator/blueprints/blueprint-kiosk-main.json",
+      blueprintPath: "D:/Unity/MyGame/.uos/ochestrator/blueprints/blueprint-kiosk-main.json",
     });
     expect(result.changeSet!.batches[0].source).toMatchObject({
       tool: "build_kiosk_from_plan",
       recipeId: "kiosk",
       blueprintId: "blueprint-kiosk-main",
-      blueprintPath: "D:/Unity/MyGame/.uos/orchestrator/blueprints/blueprint-kiosk-main.json",
+      blueprintPath: "D:/Unity/MyGame/.uos/ochestrator/blueprints/blueprint-kiosk-main.json",
     });
     const commands = result.changeSet!.batches[0].commands;
     expect(commands.every((command: any) => command.mutation === true)).toBe(true);

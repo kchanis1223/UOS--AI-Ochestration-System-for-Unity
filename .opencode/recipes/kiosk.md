@@ -22,7 +22,7 @@ of becoming a separate content-specific submodel.
 
 ## Orchestration Model
 
-The Orchestrator reads this whole recipe and decomposes kiosk work into Task
+The Ochestrator reads this whole recipe and decomposes kiosk work into Task
 Packets. A Task Packet is a bounded handoff unit, not a numeric progress range.
 Each Task Packet should fit a practical context packet, be owned by one
 functional submodel or the Editor layer, and produce one reviewable artifact or
@@ -31,7 +31,7 @@ evidence bundle.
 Submodels may read the recipe, but they execute only the recipe slice included
 in their handoff. They must not reinterpret the full kiosk workflow, choose the
 next submodel, request broad filesystem or Unity mutation, or bypass
-Orchestrator approval.
+Ochestrator approval.
 
 The Editor layer does not interpret this recipe. It executes only reviewed
 Editor commands and records evidence.
@@ -212,7 +212,7 @@ pass being edited.
 
 - `material-understanding`: receives the planning sources and this recipe slice:
   draft `KioskStructurePlan`, classify materials, identify layout references,
-  propose Main folder candidates, and return ambiguities to Orchestrator.
+  propose Main folder candidates, and return ambiguities to Ochestrator.
 - `ui-screen-builder`: receives approved Main structure, `KioskPlan`, relevant
   material mappings, and this recipe slice: create dry-run screen and navigation
   commands without changing the approved information architecture.

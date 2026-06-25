@@ -103,15 +103,15 @@ export const WRITE_EDITOR_TOOLS = new Set([
 export function uosArtifactPaths(projectDir) {
   const root = requiredString(projectDir, "projectDir");
   const contextDir = join(root, ".uos");
-  const orchestratorDir = join(contextDir, "orchestrator");
+  const ochestratorDir = join(contextDir, "ochestrator");
   return {
     contextDir,
-    orchestratorDir,
-    progressFile: join(orchestratorDir, "progress.json"),
-    blueprintsDir: join(orchestratorDir, "blueprints"),
-    plansDir: join(orchestratorDir, "plans"),
-    buildsDir: join(orchestratorDir, "builds"),
-    evidenceDir: join(orchestratorDir, "evidence"),
+    ochestratorDir,
+    progressFile: join(ochestratorDir, "progress.json"),
+    blueprintsDir: join(ochestratorDir, "blueprints"),
+    plansDir: join(ochestratorDir, "plans"),
+    buildsDir: join(ochestratorDir, "builds"),
+    evidenceDir: join(ochestratorDir, "evidence"),
   };
 }
 

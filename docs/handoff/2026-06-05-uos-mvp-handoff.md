@@ -2,7 +2,7 @@
 
 ## Goal
 
-UOS (Unity Orchestration System) is a local opencode-based orchestrator for
+UOS (Unity Orchestration System) is a local opencode-based Ochestrator for
 Unity Editor control. It must not require running from inside each Unity
 project. On entry, UOS discovers connected Unity Editor projects, lets the user
 select one target, then starts an AI conversation that can understand images,

@@ -1,4 +1,4 @@
-# UOS Orchestrator Rework
+# UOS Ochestrator Rework
 
 This document tracks the UOS architecture split from a single
 material-to-screen workflow into a general Unity orchestration system.
@@ -7,7 +7,7 @@ material-to-screen workflow into a general Unity orchestration system.
 
 ```text
 User
-  <-> Orchestrator
+  <-> Ochestrator
         -> Mode selector
         -> Internal submodel handoff
         -> Plan / Build artifacts
@@ -15,20 +15,20 @@ User
         -> Unity Editor bridge
 ```
 
-The user should always talk to the Orchestrator. The Orchestrator understands
+The user should always talk to the Ochestrator. The Ochestrator understands
 the task, selects a work mode, follows an internal submodel handoff for the
 specialized method, reviews the result, and reports progress. The Editor layer
 is the only layer that applies Unity mutations. Users do not select submodels
 or talk directly to specialist prompts.
 
-When multiple Unity Editor projects are connected, the Orchestrator can list
+When multiple Unity Editor projects are connected, the Ochestrator can list
 them and switch the active opencode session target before any Editor mutation.
 After switching, it reloads `get_uos_context` so project context and bridge
 readiness match the selected target.
 
 ## Role Boundaries
 
-- Orchestrator: understands intent, selects mode, decomposes work, creates
+- Ochestrator: understands intent, selects mode, decomposes work, creates
   internal handoffs, manages approval points, reviews output, and reports
   status.
 - Internal submodel: owns an accumulated method for one kind of work, such as
@@ -53,9 +53,9 @@ but they should not directly mutate Unity.
 ## Initial Task Split
 
 1. Add a deterministic UOS mode registry and selector.
-2. Add an Orchestrator-facing tool that records mode choice before internal
+2. Add an Ochestrator-facing tool that records mode choice before internal
    submodel work.
-3. Introduce an Orchestrator agent prompt and move the former material-to-screen
+3. Introduce an Ochestrator agent prompt and move the former material-to-screen
    prompt into an internal submodel handoff.
 4. Define the common `Plan -> Build -> Editor` artifacts.
 5. Move kiosk-specific rules into the `kiosk` recipe used by `kiosk-content`
@@ -63,7 +63,7 @@ but they should not directly mutate Unity.
 6. Implement kiosk Stage 2: build approved `KioskPlan` into Unity screens and
    transitions.
 7. Add the Editor execution boundary and batch progress helpers.
-8. Add Orchestrator progress reporting and verification summaries.
+8. Add Ochestrator progress reporting and verification summaries.
 9. Add in-session Unity project listing and selection for multi-project UOS
    work.
 
@@ -72,7 +72,7 @@ but they should not directly mutate Unity.
 - `bin/mode-core.js` registers the routing modes, including `code-editor` and
   the constrained `general-editor` fallback, and exposes `selectUosMode`.
 - `.opencode/tools/select_uos_mode.ts` exposes that selector to opencode.
-- `.opencode/agents/orchestrator.md` is the only user-facing UOS opencode
+- `.opencode/agents/ochestrator.md` is the only user-facing UOS opencode
   agent.
 - `.opencode/submodels/` stores internal submodel handoff documents.
 - `bin/artifact-core.js` defines `WorkPlan`, `EditorChangeSet`, and
@@ -82,9 +82,9 @@ but they should not directly mutate Unity.
   `EditorChangeSet` for review.
 - `bin/editor-batch-core.js` standardizes read-only checks, approval detection,
   progress records, and evidence capture for Editor batch execution.
-- `bin/orchestrator-progress-core.js` persists resumable
-  `OrchestratorProgress` records under `.uos/orchestrator/progress.json`.
-- `get_uos_context` surfaces active Orchestrator progress so a resumed session
+- `bin/ochestrator-progress-core.js` persists resumable
+  `OchestratorProgress` records under `.uos/ochestrator/progress.json`.
+- `get_uos_context` surfaces active Ochestrator progress so a resumed session
   can continue from the current mode, step, evidence, blockers, and next action.
 - `list_unity_projects` and `select_unity_project` let opencode sessions choose
   the active Unity Editor bridge target without exposing bridge tokens.

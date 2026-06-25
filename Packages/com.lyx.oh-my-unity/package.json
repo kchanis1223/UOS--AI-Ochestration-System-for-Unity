@@ -2,7 +2,7 @@
   "name": "com.lyx.oh-my-unity",
   "version": "0.1.0",
   "displayName": "Oh My Unity (Unity Editor Bridge)",
-  "description": "Unity Editor bridge for UOS: exposes a localhost Editor connection so a local opencode-based orchestrator can create, inspect, preview, and edit UGUI screens in the selected Unity project.",
+  "description": "Unity Editor bridge for UOS: exposes a localhost Editor connection so a local opencode-based ochestrator can create, inspect, preview, and edit UGUI screens in the selected Unity project.",
   "unity": "6000.0",
   "dependencies": {
     "com.unity.ugui": "2.0.0"

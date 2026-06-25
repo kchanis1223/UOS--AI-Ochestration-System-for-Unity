@@ -7,7 +7,7 @@ behavior, or user-led validation.
 
 ## Objective
 
-Build UOS (Unity Orchestration System) as a local opencode-based orchestrator.
+Build UOS (Unity Orchestration System) as a local opencode-based Ochestrator.
 On UOS entry, the user can select one connected Unity Editor project. An AI can
 understand images, documents, and PPTX files, then converse with the user while
 directly editing the selected Unity project's Editor/UI.

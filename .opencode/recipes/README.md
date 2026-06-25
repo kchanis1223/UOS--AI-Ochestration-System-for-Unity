@@ -7,7 +7,7 @@ A recipe composes functional submodels from `.opencode/submodels/` and adds
 domain-specific rules such as folder conventions, navigation patterns, naming,
 quality bars, and artifact review checkpoints.
 
-The Orchestrator reads a selected recipe end to end, decomposes it into bounded
+The Ochestrator reads a selected recipe end to end, decomposes it into bounded
 Task Packets, and passes only the relevant recipe slice to each submodel
 handoff. A Task Packet should fit a practical context packet, have one owner,
 and produce one reviewable artifact or evidence bundle.

@@ -6,7 +6,7 @@ import { stdin as processStdin, stdout as processStdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import WebSocket from "ws";
-import { discoverConfiguredUnityProjects, readUosConfig } from "./uos-config-core.js";
+import { discoverConfiguredUnityProjects, readUosConfig, saveUnityExecutableConfig } from "./uos-config-core.js";
 import { dedupeEditorsByProject, normalizeProjectKey } from "./registry-dedupe.js";
 
 export const PROTOCOL_VERSION = "1.0.0";
@@ -15,7 +15,7 @@ export const TOOL_CALL_TIMEOUT_MS = 30_000;
 export const UNITY_PACKAGE_NAME = "com.lyx.oh-my-unity";
 export const UNITY_UGUI_PACKAGE_NAME = "com.unity.ugui";
 export const UNITY_UGUI_PACKAGE_VERSION = "2.0.0";
-export const DEFAULT_UOS_AGENT = "orchestrator";
+export const DEFAULT_UOS_AGENT = "ochestrator";
 export const DEFAULT_UOS_TUI_PROMPT = "Start this UOS Unity editing session against the selected Unity Editor project only. Call get_uos_context before mutating Unity, then call select_uos_mode with the user's request or a concise task brief. Use the selected mode's internal submodel handoff and next actions to read launch-attached materials, scan material folders, inspect Unity state, plan/build through artifacts, and verify results through the Editor bridge tools. Do not ask the user to choose a specialist agent. Use planner-friendly language: say screen, button, image, transition, preview, and save before Unity-specific terms such as Scene, GameObject, Canvas, or prefab. If no user edit request is clear yet, summarize the selected project/material context, show a short recommended task menu with example prompts, and ask what to change before mutating Unity.";
 const DEFAULT_E2E_WAIT_TIMEOUT_MS = 120_000;
 const DEFAULT_E2E_STOP_TIMEOUT_MS = 15_000;
@@ -94,7 +94,7 @@ const SELECTOR_FLAGS = new Set(["--unity-project", "--uos-project", "--uos-targe
 const MATERIAL_DIR_FLAGS = new Set(["--uos-materials", "--uos-materials-dir"]);
 const ATTACHMENT_FLAGS = new Set(["--uos-file", "--uos-attach"]);
 const DRY_RUN_FLAGS = new Set(["--uos-dry-run", "--uos-preflight", "--uos-print-launch"]);
-const UOS_ENTRY_COMMANDS = new Set(["chat", "enter"]);
+const UOS_ENTRY_COMMANDS = new Set(["chat", "enter", "tui"]);
 const SMOKE_IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"]);
 const SMOKE_VIDEO_EXTENSIONS = new Set([".mp4", ".mov", ".webm", ".m4v"]);
 const SMOKE_SCREEN_MATERIAL_EXTENSIONS = new Set([
@@ -552,12 +552,14 @@ function formatUosMainHelp() {
     "UOS (Unity Orchestration System)",
     "",
     "Usage:",
-    "  uos [--unity-project <selector>] [opencode args...]",
+    "  uos [gui options]",
     "  uos <command> [options]",
     "",
     "Default entry:",
-    "  uos                                  Start opencode TUI for a selected Unity Editor project",
-    "  uos chat                             Same as `uos`, but explicit about entering UOS chat",
+    "  uos                                  Open the local browser GUI workbench",
+    "  uos gui --port 0                     Open the local browser GUI workbench",
+    "  uos chat                             Start opencode TUI for a selected Unity Editor project",
+    "  uos tui                              Same as `uos chat`",
     "  uos enter --unity-project MyGame     Deterministically enter one selected project",
     "  uos mvp --unity-project MyGame       Print a user-led MVP validation walkthrough",
     "  uos mvp-progress .uos/mvp-evidence.json",
@@ -565,7 +567,8 @@ function formatUosMainHelp() {
     "  uos --uos-materials ./Plans run \"create the lobby UI from this deck\"",
     "",
     "UOS commands:",
-    "  chat | enter                         Select a Unity project and start opencode TUI",
+    "  gui                                  Open the browser GUI workbench",
+    "  chat | enter | tui                   Select a Unity project and start opencode TUI",
     "  mvp | validate-mvp                   Print a read-only MVP validation preflight",
     "  mvp-progress | mvp-status            Show progress from a saved MVP evidence bundle",
     "  setup                                Link local opencode resources",
@@ -1103,7 +1106,7 @@ export function parseSmokeOptions(argv) {
         throw new Error("[uos] --ai-agent requires an opencode agent name");
       }
       if (value.trim() !== DEFAULT_UOS_AGENT) {
-        throw new Error("[uos] UOS AI smoke sessions only support --ai-agent orchestrator; internal submodels are selected by the Orchestrator");
+        throw new Error("[uos] UOS AI smoke sessions only support --ai-agent ochestrator; internal submodels are selected by the Ochestrator");
       }
       options.aiRunAgent = DEFAULT_UOS_AGENT;
       options.aiRun = true;
@@ -4038,6 +4041,94 @@ export async function resolveUnityExecutable(projectPath, options = {}) {
   throw new Error(`[uos e2e] could not find Unity executable${hint}. Pass --unity <path-to-Unity.exe>.${searched}`);
 }
 
+export async function resolveUnityExecutableForGui(projectPath, options = {}) {
+  const resolvedProjectPath = path.resolve(projectPath ?? "");
+  await assertUnityProjectRoot(resolvedProjectPath);
+  const version = await readUnityProjectVersion(resolvedProjectPath);
+  const config = options.config ?? await (options.readUosConfig ?? readUosConfig)(options);
+  const configuredForVersion = version !== undefined ? stringValue(config?.unityEditors?.[version]) : undefined;
+  const candidates = [
+    configuredForVersion,
+    stringValue(config?.defaultUnityExecutable),
+    stringValue(options.unityPath),
+    stringValue(options.env?.UNITY_EXE),
+    stringValue(options.env?.UNITY_PATH),
+    ...unityExecutableCandidates(version, options),
+  ].filter((item) => item !== undefined);
+
+  const searched = [];
+  for (const candidate of candidates) {
+    const resolved = path.resolve(candidate);
+    searched.push(resolved);
+    if (await fileExists(resolved)) {
+      return {
+        ok: true,
+        unityPath: resolved,
+        projectPath: resolvedProjectPath,
+        unityVersion: version,
+        source: candidate === configuredForVersion
+          ? "configured-version"
+          : candidate === config?.defaultUnityExecutable
+            ? "configured-default"
+            : candidate === options.unityPath
+              ? "option"
+              : candidate === options.env?.UNITY_EXE || candidate === options.env?.UNITY_PATH
+                ? "env"
+                : "unity-hub",
+        searched,
+      };
+    }
+  }
+
+  return {
+    ok: false,
+    projectPath: resolvedProjectPath,
+    unityVersion: version,
+    searched,
+    error: `[uos gui] could not find Unity executable${version !== undefined ? ` for Unity ${version}` : ""}. Configure Unity.exe in the GUI.`,
+  };
+}
+
+export async function configureUnityExecutableForGui(input = {}, options = {}) {
+  const unityExecutable = stringValue(input.unityExecutable ?? input.path);
+  if (unityExecutable === undefined) {
+    throw new Error("[uos gui] unityExecutable is required");
+  }
+  const resolved = path.resolve(unityExecutable);
+  await assertFile(resolved, "unityExecutable");
+  const projectPath = stringValue(input.projectPath);
+  const version = stringValue(input.version)
+    ?? (projectPath !== undefined ? await readUnityProjectVersion(path.resolve(projectPath)) : undefined);
+  return await (options.saveUnityExecutableConfig ?? saveUnityExecutableConfig)({
+    defaultUnityExecutable: input.default === false ? undefined : resolved,
+    version,
+    unityExecutable: version !== undefined ? resolved : undefined,
+  }, options);
+}
+
+export async function launchUnityProject(projectPath, options = {}) {
+  const resolvedProjectPath = path.resolve(projectPath ?? "");
+  const resolved = await resolveUnityExecutableForGui(resolvedProjectPath, options);
+  if (resolved.ok !== true) return { ...resolved, launched: false };
+
+  const args = ["-projectPath", resolvedProjectPath];
+  const launcher = options.launchUnity ?? defaultLaunchUnity;
+  const child = await launcher(resolved.unityPath, args, {
+    ...options,
+    projectPath: resolvedProjectPath,
+  });
+  return {
+    ok: true,
+    launched: true,
+    projectPath: resolvedProjectPath,
+    unityPath: resolved.unityPath,
+    unityVersion: resolved.unityVersion,
+    args,
+    pid: positiveInt(child?.pid),
+    source: resolved.source,
+  };
+}
+
 async function resolveUnityE2ELogFile(projectPath, options = {}) {
   const raw = stringValue(options.logFile);
   const logFile = raw !== undefined
@@ -4067,6 +4158,10 @@ function secondaryLogPath(primaryLogFile, index) {
 function defaultLaunchUnity(unityPath, args, options = {}) {
   const child = spawn(unityPath, args, {
     cwd: options.projectPath,
+    env: {
+      ...process.env,
+      ...(options.unityEnv ?? {}),
+    },
     stdio: "ignore",
     windowsHide: true,
   });
@@ -4335,7 +4430,7 @@ export async function collectDoctorReport(options = {}) {
   const opencodeCli = inspectOpencodeCliCapabilities(options);
   const requiredPaths = [
     ["package.json", path.join(repoRoot, "package.json")],
-    ["orchestrator agent", path.join(repoRoot, ".opencode", "agents", "orchestrator.md")],
+    ["ochestrator agent", path.join(repoRoot, ".opencode", "agents", "ochestrator.md")],
     ["opencode tools", path.join(repoRoot, ".opencode", "tools", "_bridge.ts")],
     ["Unity package", path.join(repoRoot, "Packages", "com.lyx.oh-my-unity", "package.json")],
   ];
@@ -10894,6 +10989,7 @@ export function formatEditorJson(editors) {
       uosPackageVersion: stringValue(entry.uosPackageVersion),
       protocolVersion: stringValue(entry.protocolVersion),
       autoStartBridge: typeof entry.autoStartBridge === "boolean" ? entry.autoStartBridge : undefined,
+      uosGuiSessionId: stringValue(entry.uosGuiSessionId),
       selectors: selectorValues(entry),
     })),
   }, null, 2);
@@ -10920,6 +11016,7 @@ function publicEditorTarget(entry) {
     uosPackageVersion: stringValue(entry.uosPackageVersion),
     protocolVersion: stringValue(entry.protocolVersion),
     autoStartBridge: typeof entry.autoStartBridge === "boolean" ? entry.autoStartBridge : undefined,
+    uosGuiSessionId: stringValue(entry.uosGuiSessionId),
   };
 }
 

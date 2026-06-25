@@ -1,10 +1,13 @@
 # UOS for Unity
 
-UOS (Unity Orchestration System) is a local opencode-based orchestrator for
+UOS (Unity Orchestration System) is a local opencode-based Ochestrator for
 Unity Editor automation. It is not meant to run inside a Unity project folder.
 Instead, the Unity package starts an Editor bridge, and the local `uos` launcher
-discovers connected Editors, lets you choose one, then starts opencode with the
-selected Editor connection injected into the environment.
+opens a browser-based GUI workbench. The GUI discovers configured Unity
+projects, lets you install/link UOS, opens Unity when needed, and runs the
+Ochestrator through headless `opencode run` with the selected project context
+injected into the environment. The older terminal TUI remains available through
+`uos chat` and `uos tui`.
 
 Status: alpha. The bridge, UGUI screen tools, local Editor discovery, and
 planning-material readers are implemented. End-to-end UX hardening is still in
@@ -13,12 +16,14 @@ progress.
 ## Current Architecture
 
 ```text
-local terminal
+local browser GUI
   uos
-    -> discovers live Unity Editor bridge registry entries
-    -> selects one target project
-    -> starts opencode from this UOS repo root
+    -> starts a local 127.0.0.1 GUI backend
+    -> discovers configured Unity projects and live bridge registry entries
+    -> selects one target project in Projects
+    -> runs opencode headlessly from this UOS repo root
     -> injects UNITY_MCP_HOST / PORT / TOKEN / UOS_PROJECT_DIR
+    -> streams Ochestrator events, Blueprint approval, assets, and activity
 
 Unity Editor project
   Packages/com.lyx.oh-my-unity
@@ -32,10 +37,13 @@ Unity Editor project
 
 | Path | Role |
 |---|---|
-| `bin/uos.js` | Local UOS launcher. Lists/selects live Unity Editors and forwards to opencode. |
+| `bin/uos.js` | Local UOS launcher. Opens the GUI by default and preserves developer CLI/TUI subcommands. |
 | `bin/uos-core.js` | Registry discovery, handshake, selector parsing, and target env construction. |
+| `bin/uos-gui-server.js` | Local browser GUI backend, REST API, WebSocket events, and headless opencode runner. |
+| `bin/uos-gui-core.js` | GUI project ids, token redaction, sessions, approvals, uploads, and event parsing. |
+| `gui/` | React+Vite browser workbench for Projects, Chat, Blueprint, Assets, and Activity. |
 | `Packages/com.lyx.oh-my-unity/` | Unity 6 Editor package with WebSocket bridge and UGUI backend. |
-| `.opencode/agents/orchestrator.md` | Only user-facing UOS opencode agent. Selects modes, creates internal submodel handoffs, and reports progress. |
+| `.opencode/agents/ochestrator.md` | Only user-facing UOS opencode agent. Selects modes, creates internal submodel handoffs, and reports progress. |
 | `.opencode/submodels/` | Internal submodel handoff documents. These are not user-selectable opencode agents. |
 | `.opencode/tools/` | Bun-native opencode tools for Unity bridge calls and planning materials. |
 | `.opencode/plugins/uos.ts` | Auto-discovered local plugin that best-effort journals successful UI mutations and preview captures. |
@@ -49,6 +57,11 @@ Unity Editor project
 uos --help
 uos ready --help
 uos help smoke
+
+# default user flow: open the local browser workbench
+uos
+uos gui
+uos gui --no-open --port 0
 
 # optional setup: store the folder that contains user Unity projects and response language
 uos setup --unity-projects D:/UnityProject --language ko
@@ -89,11 +102,11 @@ uos doctor --runtime
 uos ready
 uos ready --wait --unity-project MyGame
 
-# interactive UOS chat/TUI; prompts for a target if more than one live Editor exists
+# developer terminal TUI; prompts for a target if more than one live Editor exists
 uos chat
+uos tui
 uos chat --uos-wait --uos-wait-timeout-ms 60000
 uos chat --unity-project MyGame --continue
-uos
 
 # opencode management commands pass through without selecting a Unity project
 uos models
@@ -205,6 +218,12 @@ uos e2e --project D:/Unity/MyGame --secondary-project D:/Unity/OtherGame --read-
 uos e2e --project D:/Unity/MyGame --secondary-project D:/Unity/OtherGame --read-only --public-mvp-json --public-chat-dry-run --public-run-dry-run --uos-materials ./Assets/Planning --uos-file lobby.pptx
 ```
 
+In the browser workbench, Chat only uses a GUI-managed Unity connection. Open
+the project with `Open Unity` in the Projects tab and wait for `Connected`.
+Unity Editors opened outside the GUI are shown as external and are not used for
+GUI Chat. The GUI connection state is stored in `.uos/gui/connection.json`, and
+bridge tokens are never returned by the GUI API.
+
 Supported selector flags are `--unity-project`, `--uos-project`, and
 `--uos-target`. A selector can be a 1-based list index, Editor instance id,
 project name, full project path, or an unambiguous substring.
@@ -288,11 +307,11 @@ When persisted `.uos` context exists, that summary also surfaces screen count,
 the active screen, latest verification or preview status, and material
 candidate count before the TUI starts.
 UOS starts opencode from this repository root and always injects
-`--agent orchestrator` for `uos run ...` and TUI launches, including TUI
+`--agent ochestrator` for `uos run ...` and TUI launches, including TUI
 launches with flags such as `--model`. User-facing UOS sessions do not support
 choosing specialist agents directly. `opencode.json` also disables opencode's
 native `build` and `plan` primary agents so Tab-based agent switching only
-exposes `orchestrator` after relaunch. The Orchestrator is the only
+exposes `ochestrator` after relaunch. The Ochestrator is the only
 conversational agent: it calls `get_uos_context`, selects a UOS mode with
 `select_uos_mode`, uses internal submodel handoff documents under
 `.opencode/submodels/`, and keeps Unity mutations behind the Editor bridge
@@ -501,7 +520,7 @@ launches outside this repository, `uos setup` rewrites the global
 `opencode.jsonc` from this repo's `opencode.json`, merges
 `.opencode/package.json` dependencies into the global opencode config directory,
 and runs `npm install --ignore-scripts` there. That keeps the global direct
-opencode path on the same Orchestrator-only agent surface. Pass
+opencode path on the same Ochestrator-only agent surface. Pass
 `--unity-projects <dir>` during setup to save the folder that contains user
 Unity projects in `~/.config/uos/config.json`; pass
 `--language <code|name>` such as `ko`, `en`, `Japanese`, or `中文` to save the

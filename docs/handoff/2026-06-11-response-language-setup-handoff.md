@@ -4,7 +4,7 @@
 
 UOS default assistant response language is a user preference, not an opencode
 agent choice. It is stored in the UOS launcher config during setup and injected
-into the Orchestrator startup prompt for every fresh or resumed UOS TUI launch.
+into the Ochestrator startup prompt for every fresh or resumed UOS TUI launch.
 
 ## Implemented
 

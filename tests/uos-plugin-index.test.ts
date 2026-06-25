@@ -4,8 +4,8 @@ import { UosJournalPlugin } from "../.opencode/plugins/uos.ts";
 const { applyToIndex, emptyIndex, sanitizeJournalValue, shouldAutoAllowUosPermission, permissionToolName } = UosJournalPlugin;
 
 describe("UOS plugin screen index", () => {
-  test("auto-allows only low-risk UOS permission prompts", () => {
-    expect(shouldAutoAllowUosPermission({
+  test("auto-allows only low-risk UOS permission prompts", async () => {
+    expect(await shouldAutoAllowUosPermission({
       permission: "tool",
       patterns: ["get_uos_context"],
       metadata: {},
@@ -15,17 +15,17 @@ describe("UOS plugin screen index", () => {
       patterns: ["tool:read_planning_material"],
       metadata: {},
     })).toBe("read_planning_material");
-    expect(shouldAutoAllowUosPermission({
+    expect(await shouldAutoAllowUosPermission({
       permission: "tool",
       patterns: ["create_ui_screen"],
       metadata: {},
     })).toBe(false);
-    expect(shouldAutoAllowUosPermission({
+    expect(await shouldAutoAllowUosPermission({
       permission: "tool",
       patterns: ["save_scene"],
       metadata: {},
     })).toBe(false);
-    expect(shouldAutoAllowUosPermission({
+    expect(await shouldAutoAllowUosPermission({
       permission: "tool",
       patterns: ["create_ui_screen"],
       metadata: { source: "read_planning_material" },

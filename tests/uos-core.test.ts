@@ -1,4 +1,4 @@
-﻿import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { readFileSync, writeFileSync } from "node:fs";
 import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
@@ -467,7 +467,7 @@ describe("uos-core target selection helpers", () => {
       "--ai-run",
       "--ai-model",
       "anthropic/claude-haiku-4-5",
-      "--ai-agent=orchestrator",
+      "--ai-agent=ochestrator",
       "--ai-title",
       "UOS AI Smoke Custom",
       "--ai-timeout-ms",
@@ -478,13 +478,13 @@ describe("uos-core target selection helpers", () => {
       aiRun: true,
       aiOnly: false,
       aiRunModel: "anthropic/claude-haiku-4-5",
-      aiRunAgent: "orchestrator",
+      aiRunAgent: "ochestrator",
       aiRunTitle: "UOS AI Smoke Custom",
       aiRunTimeoutMs: 120000,
       aiRunObjectName: "AI Smoke Object",
     });
     expect(() => parseSmokeOptions(["--ai-run", "--ai-agent=build"]))
-      .toThrow("only support --ai-agent orchestrator");
+      .toThrow("only support --ai-agent ochestrator");
     expect(parseSmokeOptions(["--ai-feedback-iterations", "3"]))
       .toMatchObject({
         write: true,
@@ -2222,7 +2222,7 @@ describe("uos-core target selection helpers", () => {
       "--file",
       resolve("D:/Plans", "brief.md"),
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "make a menu",
     ]);
     expect(buildForwardArgs(["run", "--agent", "custom-agent", "make a menu"], target, {
@@ -2232,7 +2232,7 @@ describe("uos-core target selection helpers", () => {
       "--file",
       resolve("D:/Unity/Chosen", "brief.md"),
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "make a menu",
     ]);
     expect(buildForwardArgs(["--print-logs", "run", "make a menu"], target, {
@@ -2246,7 +2246,7 @@ describe("uos-core target selection helpers", () => {
       "--file",
       resolve("D:/Unity/Chosen", "brief.md"),
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "make a menu",
     ]);
     expect(buildForwardArgs(["run", "--continue", "make the title green"], target, {
@@ -2259,7 +2259,7 @@ describe("uos-core target selection helpers", () => {
       "--file",
       resolve("D:/Unity/Chosen", "brief.md"),
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "--continue",
       "make the title green",
     ]);
@@ -2271,7 +2271,7 @@ describe("uos-core target selection helpers", () => {
       "--file",
       "C:/Temp/uos-run-context.md",
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "create from binary materials",
     ]);
     const tuiArgs = buildForwardArgs([], target, {
@@ -2294,7 +2294,7 @@ describe("uos-core target selection helpers", () => {
     expect(tuiArgs[1]).toContain("Before save/delete/broad changes, summarize impact and ask for explicit approval.");
     expect(tuiArgs[1]).toContain("After work, summarize what changed, preview/verification status, save state, and next options.");
     expect(tuiArgs).toContain("--agent");
-    expect(tuiArgs).toContain("orchestrator");
+    expect(tuiArgs).toContain("ochestrator");
 
     const launchEnv = buildTargetEnv(target, {}, { launchInputs: { files: [] } });
     const tuiWithLaunchEnv = buildForwardArgs([], target, {
@@ -2348,7 +2348,7 @@ describe("uos-core target selection helpers", () => {
     expect(tuiWithOptions[0]).toBe("--prompt");
     expect(tuiWithOptions).toEqual(expect.arrayContaining([
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "--model",
       "anthropic/claude-opus-4-8",
     ]));
@@ -2357,7 +2357,7 @@ describe("uos-core target selection helpers", () => {
     expect(tuiWithGlobalOption[0]).toBe("--prompt");
     expect(tuiWithGlobalOption).toEqual(expect.arrayContaining([
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "--print-logs",
       "--model",
       "anthropic/claude-opus-4-8",
@@ -2367,11 +2367,11 @@ describe("uos-core target selection helpers", () => {
       "--prompt",
       expect.stringContaining("get_uos_context"),
       "--agent",
-      "orchestrator",
+      "ochestrator",
     ]);
     expect(buildForwardArgs(["--prompt", "custom prompt", "--agent", "custom-agent"], target, {})).toEqual([
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "--prompt",
       "custom prompt",
     ]);
@@ -2379,10 +2379,10 @@ describe("uos-core target selection helpers", () => {
     expect(continuedTuiArgs[0]).toBe("--prompt");
     expect(continuedTuiArgs[1]).toContain("# UOS Startup");
     expect(continuedTuiArgs[1]).toContain("Call `get_uos_context` first");
-    expect(continuedTuiArgs).toEqual(expect.arrayContaining(["--agent", "orchestrator", "--continue"]));
+    expect(continuedTuiArgs).toEqual(expect.arrayContaining(["--agent", "ochestrator", "--continue"]));
     expect(buildForwardArgs(["--prompt", "resume with user context", "--continue"], target, {})).toEqual([
       "--agent",
-      "orchestrator",
+      "ochestrator",
       "--prompt",
       "resume with user context",
       "--continue",
@@ -2390,7 +2390,7 @@ describe("uos-core target selection helpers", () => {
     const sessionTuiArgs = buildForwardArgs(["--session", "sess_123"], target, {});
     expect(sessionTuiArgs[0]).toBe("--prompt");
     expect(sessionTuiArgs[1]).toContain("# UOS Startup");
-    expect(sessionTuiArgs).toEqual(expect.arrayContaining(["--agent", "orchestrator", "--session", "sess_123"]));
+    expect(sessionTuiArgs).toEqual(expect.arrayContaining(["--agent", "ochestrator", "--session", "sess_123"]));
     expect(buildForwardArgs(["models"], target, {})).toEqual(["models"]);
     expect(buildForwardArgs(["--print-logs", "models"], target, {})).toEqual(["--print-logs", "models"]);
     expect(buildForwardArgs(["--help"], target, {})).toEqual(["--help"]);
@@ -2444,7 +2444,7 @@ describe("uos-core target selection helpers", () => {
       expect(result.readiness.ready).toBe(true);
       expect(result.opencodeArgs[0]).toBe("--prompt");
       expect(result.opencodeArgs).toContain("--agent");
-      expect(result.opencodeArgs).toContain("orchestrator");
+      expect(result.opencodeArgs).toContain("ochestrator");
 
       const prompt = result.opencodeArgs[1];
       expect(prompt).toContain("# UOS Startup");
@@ -2731,7 +2731,7 @@ describe("uos-core target selection helpers", () => {
       expect(summary).toContain("opencode run --file: 1 text-like file(s)");
       expect(summary).toContain("not passed to opencode --file: 1 binary/visual file(s)");
       expect(summary).not.toContain("TUI launches expose attached files");
-      const tuiSummary = formatLaunchSummary(target, ["--agent", "orchestrator"], inputs);
+      const tuiSummary = formatLaunchSummary(target, ["--agent", "ochestrator"], inputs);
       expect(tuiSummary).toContain("attached files: 2");
       expect(tuiSummary).toContain("opencode run --file: not used for TUI/non-run launches");
       expect(tuiSummary).toContain("TUI launches expose attached files through UOS_ATTACHED_FILES/get_uos_context");
@@ -2740,10 +2740,10 @@ describe("uos-core target selection helpers", () => {
         "--prompt",
         "# UOS Startup\n\nCall get_uos_context before mutating Unity.\n\n## Selected Target",
         "--agent",
-        "orchestrator",
+        "ochestrator",
         "--continue",
       ]);
-      expect(promptSummary).toContain("opencode: --prompt <# UOS Startup ...> --agent orchestrator --continue");
+      expect(promptSummary).toContain("opencode: --prompt <# UOS Startup ...> --agent ochestrator --continue");
       expect(promptSummary).not.toContain("Call get_uos_context before mutating Unity");
       const warningSummary = formatLaunchSummary(target, ["run", "make UI"], inputs, {
         warnings: ["Unity bridge did not report supportedTools"],
@@ -2759,7 +2759,7 @@ describe("uos-core target selection helpers", () => {
       expect(capabilitySummary).toContain("missing required tools:");
       expect(capabilitySummary).toContain("required write tools");
       expect(capabilitySummary).toContain("missing required write tools:");
-      const contextSummary = formatLaunchSummary(target, ["--agent", "orchestrator"], inputs, undefined, {
+      const contextSummary = formatLaunchSummary(target, ["--agent", "ochestrator"], inputs, undefined, {
         UOS_CONTEXT_SUMMARY: [
           "[uos context] projectName: LaunchGame",
           "[uos context] screens: 2",
@@ -3493,9 +3493,9 @@ describe("uos-core target selection helpers", () => {
     await mkdir(registry, { recursive: true });
     await writeFile(join(repoRoot, "package.json"), "{}");
     await writeFile(join(repoRoot, "opencode.json"), JSON.stringify({
-      default_agent: "orchestrator",
+      default_agent: "ochestrator",
     }));
-    await writeFile(join(repoRoot, ".opencode", "agents", "orchestrator.md"), "");
+    await writeFile(join(repoRoot, ".opencode", "agents", "ochestrator.md"), "");
     await writeFile(join(repoRoot, ".opencode", "plugins", "uos.ts"), "");
     await writeFile(join(repoRoot, ".opencode", "plugins", "claude-auth.ts"), "");
     await writeFile(join(repoRoot, ".opencode", "tools", "_bridge.ts"), "");
@@ -3597,7 +3597,7 @@ describe("uos-core target selection helpers", () => {
       const output = formatDoctorReport(report);
       expect(output).toContain("[uos doctor]");
       expect(output).toContain("[ok] Unity package");
-      expect(output).toContain("[ok] default agent: orchestrator");
+      expect(output).toContain("[ok] default agent: ochestrator");
       expect(output).toContain("[ok] tools: 58 entrypoint(s)");
       expect(output).not.toContain("[ok] plugin: opencode-claude-auth@latest");
       expect(output).toContain("[ok] local plugin:");
@@ -3640,7 +3640,7 @@ describe("uos-core target selection helpers", () => {
       registry: { dir: "D:/registry", entries: [], missing: true },
       opencodeResources: {
         config: { ok: true, path: "D:/UOS/opencode.json" },
-        defaultAgent: { ok: true, name: "orchestrator" },
+        defaultAgent: { ok: true, name: "ochestrator" },
         tools: { count: 48, missing: [] },
         plugins: [],
         autoPlugin: { ok: true, path: "D:/UOS/.opencode/plugins/uos.ts" },
@@ -3675,7 +3675,7 @@ describe("uos-core target selection helpers", () => {
       },
       opencodeResources: {
         config: { ok: true, path: "D:/UOS/opencode.json" },
-        defaultAgent: { ok: true, name: "orchestrator" },
+        defaultAgent: { ok: true, name: "ochestrator" },
         tools: { count: 48, missing: [] },
         plugins: [],
         autoPlugin: { ok: true, path: "D:/UOS/.opencode/plugins/uos.ts" },
@@ -3694,7 +3694,7 @@ describe("uos-core target selection helpers", () => {
     await mkdir(join(repoRoot, ".opencode", "agents"), { recursive: true });
     await mkdir(join(repoRoot, ".opencode", "tools"), { recursive: true });
     await writeFile(join(repoRoot, "opencode.json"), JSON.stringify({
-      default_agent: "orchestrator",
+      default_agent: "ochestrator",
       plugin: ["file://./.opencode/plugins/uos.ts"],
     }));
     await writeFile(join(repoRoot, ".opencode", "tools", "get_project_info.ts"), "");
@@ -3733,7 +3733,7 @@ describe("uos-core target selection helpers", () => {
         return {
         status: 0,
         stdout: JSON.stringify({
-          default_agent: "orchestrator",
+          default_agent: "ochestrator",
           plugin: [
             "opencode-claude-auth@latest",
             "file://./.opencode/plugins/uos.ts",
@@ -3748,7 +3748,7 @@ describe("uos-core target selection helpers", () => {
     expect(calls[0]).toEqual(["--print-logs", "--log-level", "ERROR", "debug", "config"]);
     expect(runtime.ok).toBe(true);
     expect(runtime.authExpired).toBe(true);
-    expect(runtime.defaultAgent).toBe("orchestrator");
+    expect(runtime.defaultAgent).toBe("ochestrator");
     expect(runtime.duplicatePlugins).toHaveLength(1);
     expect(runtime.duplicatePlugins[0].values).toHaveLength(2);
 
@@ -3757,7 +3757,7 @@ describe("uos-core target selection helpers", () => {
       commandRunner: () => ({
         status: 0,
         stdout: JSON.stringify({
-          default_agent: "orchestrator",
+          default_agent: "ochestrator",
           plugin: ["opencode-claude-auth@latest"],
         }),
         stderr: "ERROR 2026-06-04T20:31:18 service=plugin error=undefined is not an object (evaluating 'O.config') plugin config hook failed",
@@ -3815,7 +3815,7 @@ describe("uos-core target selection helpers", () => {
       repoRoot: "D:/UOS",
       files: [
         { name: "package.json", path: "D:/UOS/package.json", ok: true },
-        { name: "orchestrator agent", path: "D:/UOS/.opencode/agents/orchestrator.md", ok: true },
+        { name: "ochestrator agent", path: "D:/UOS/.opencode/agents/ochestrator.md", ok: true },
       ],
       commands: [
         { name: "node", required: true, result: { ok: true } },
@@ -3832,7 +3832,7 @@ describe("uos-core target selection helpers", () => {
       },
       opencodeResources: {
         config: { ok: true },
-        defaultAgent: { ok: true, name: "orchestrator" },
+        defaultAgent: { ok: true, name: "ochestrator" },
         tools: { missing: [] },
         autoPlugin: { ok: true },
         duplicateLocalPlugins: [],
@@ -3840,7 +3840,7 @@ describe("uos-core target selection helpers", () => {
       opencodeRuntime: {
         ok: true,
         authExpired: false,
-        defaultAgent: "orchestrator",
+        defaultAgent: "ochestrator",
         duplicatePlugins: [],
       },
       opencodeCli: {
@@ -4526,7 +4526,7 @@ describe("uos-core target selection helpers", () => {
         command: "opencode",
         title: "UOS AI Smoke Test",
         model: "anthropic/claude-haiku-4-5",
-        agent: "orchestrator",
+        agent: "ochestrator",
         objectName: "AI Smoke Object",
         observedTools: ["get_uos_context", "get_project_info", "create_scene_object", "delete_scene_object"],
         missingTools: [],
@@ -4538,7 +4538,7 @@ describe("uos-core target selection helpers", () => {
         markerSeen: true,
       });
       expect(commandCall.command).toBe("opencode");
-      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--title"]);
+      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--title"]);
       expect(commandCall.args).toContain("-m");
       expect(commandCall.args).toContain("anthropic/claude-haiku-4-5");
       expect(commandCall.args.at(-1)).toContain("AI Smoke Object");
@@ -4640,7 +4640,7 @@ describe("uos-core target selection helpers", () => {
         journalVerified: true,
       });
       expect(commandCall.command).toBe("opencode");
-      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--title"]);
+      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--title"]);
       expect(commandCall.args).not.toContain("--file");
       expect(commandCall.args.at(-1)).toContain("update_ui_element_from_context");
       expect(commandCall.args.at(-1)).toContain("capture_preview_from_context");
@@ -4781,7 +4781,7 @@ describe("uos-core target selection helpers", () => {
         observedJournalTools: ["inspect_screen_feedback_from_context", "update_ui_element_from_context", "capture_preview_from_context"],
         journalOrderOk: true,
       });
-      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--title"]);
+      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--title"]);
       expect(commandCall.args).not.toContain("--file");
 
       const output = formatSmokeResult(result);
@@ -4963,7 +4963,7 @@ describe("uos-core target selection helpers", () => {
           mismatchRatio: 0.25,
         },
       });
-      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--title"]);
+      expect(commandCall.args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--title"]);
 
       const output = formatSmokeResult(result);
       expect(output).toContain("opencode AI run: ok model=anthropic/claude-haiku-4-5 screen=AIFeedbackMove_ID mode=context-follow-up action=move");
@@ -5869,7 +5869,7 @@ describe("uos-core target selection helpers", () => {
         missingTools: [],
       });
       expect(commandCall.args.slice(0, 4)).toEqual(["run", "--file", materialPath, "--agent"]);
-      expect(commandCall.args).toContain("orchestrator");
+      expect(commandCall.args).toContain("ochestrator");
       expect(commandCall.args.at(-1)).toContain("get_uos_context");
       expect(commandCall.args.at(-1)).toContain("read_planning_material");
       expect(commandCall.args.at(-1)).toContain("create_screen_from_material");
@@ -6015,7 +6015,7 @@ describe("uos-core target selection helpers", () => {
       expect(commandCalls[0].args.slice(0, 4)).toEqual(["run", "--file", materialPath, "--agent"]);
       expect(commandCalls[0].args).not.toContain("--continue");
       expect(commandCalls[0].args.at(-1)).toContain("create_screen_from_material");
-      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--continue"]);
+      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--continue"]);
       expect(commandCalls[1].args).not.toContain("--file");
       expect(commandCalls[1].args.at(-1)).toContain("update_ui_element_from_context");
       expect(commandCalls[1].args.at(-1)).toContain("AITwoTurnMaterial_AI_ID");
@@ -6180,13 +6180,13 @@ describe("uos-core target selection helpers", () => {
       });
 
       expect(commandCalls).toHaveLength(2);
-      expect(commandCalls[0].args.slice(0, 3)).toEqual(["run", "--agent", "orchestrator"]);
+      expect(commandCalls[0].args.slice(0, 3)).toEqual(["run", "--agent", "ochestrator"]);
       expect(commandCalls[0].args).not.toContain("--file");
       expect(commandCalls[0].args).not.toContain("--continue");
       expect(commandCalls[0].args.at(-1)).toContain("create_screen_from_material");
       expect(JSON.parse(commandCalls[0].options.env.UOS_ATTACHED_FILES)).toContain(materialPath);
       expect(commandCalls[0].options.env.UOS_CONTEXT_SUMMARY).toContain("mock.png");
-      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--continue"]);
+      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--continue"]);
       expect(commandCalls[1].args).not.toContain("--file");
       expect(commandCalls[1].args.at(-1)).toContain("add_ui_element_from_context");
       expect(commandCalls[1].args.at(-1)).toContain("AITwoTurnImage_AI_ID");
@@ -6809,7 +6809,7 @@ describe("uos-core target selection helpers", () => {
         observedTools: ["get_uos_context", "get_project_info", "read_planning_material", "create_pptx_deck_screens"],
         missingTools: [],
       });
-      expect(commandCall.args.slice(0, 3)).toEqual(["run", "--agent", "orchestrator"]);
+      expect(commandCall.args.slice(0, 3)).toEqual(["run", "--agent", "ochestrator"]);
       expect(commandCall.args).not.toContain("--file");
       expect(commandCall.args.at(-1)).toContain("get_uos_context");
       expect(commandCall.args.at(-1)).toContain("read_planning_material");
@@ -6977,13 +6977,13 @@ describe("uos-core target selection helpers", () => {
       });
 
       expect(commandCalls).toHaveLength(2);
-      expect(commandCalls[0].args.slice(0, 3)).toEqual(["run", "--agent", "orchestrator"]);
+      expect(commandCalls[0].args.slice(0, 3)).toEqual(["run", "--agent", "ochestrator"]);
       expect(commandCalls[0].args).not.toContain("--file");
       expect(commandCalls[0].args).not.toContain("--continue");
       expect(commandCalls[0].args.at(-1)).toContain("create_pptx_deck_screens");
       expect(JSON.parse(commandCalls[0].options.env.UOS_ATTACHED_FILES)).toContain(pptxPath);
       expect(commandCalls[0].options.env.UOS_CONTEXT_SUMMARY).toContain("deck.pptx");
-      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "orchestrator", "--continue"]);
+      expect(commandCalls[1].args.slice(0, 4)).toEqual(["run", "--agent", "ochestrator", "--continue"]);
       expect(commandCalls[1].args).not.toContain("--file");
       expect(commandCalls[1].args.at(-1)).toContain("update_ui_element_from_context");
       expect(commandCalls[1].args.at(-1)).toContain("AITwoTurnDeck_AI_1_ID");
@@ -7733,10 +7733,10 @@ describe("uos-core target selection helpers", () => {
             status: 0,
             stdout: [
               "[uos] launch summary",
-              "  opencode: --prompt <# UOS Startup ...> --agent orchestrator",
+              "  opencode: --prompt <# UOS Startup ...> --agent ochestrator",
               "  note: TUI launches expose attached files through UOS_ATTACHED_FILES/get_uos_context; use `uos run` for opencode --file attachments in the first model turn.",
               "[uos] forwarded opencode argv:",
-              "  [\"--prompt\",\"# UOS Startup\\n\\nCall get_uos_context and select_uos_mode before mutating Unity.\",\"--agent\",\"orchestrator\"]",
+              "  [\"--prompt\",\"# UOS Startup\\n\\nCall get_uos_context and select_uos_mode before mutating Unity.\",\"--agent\",\"ochestrator\"]",
               "  {\"UNITY_MCP_TOKEN\":\"" + publicSecret + "\"}",
               "  bridgeToken=" + bridgeSecret,
               "  UOS_ATTACHED_FILES: [\"" + join(projectDir, "Plans", "brief.md").replace(/\\/g, "\\\\") + "\"]",
@@ -7751,7 +7751,7 @@ describe("uos-core target selection helpers", () => {
             stdout: [
               "[uos] launch summary",
               "[uos] forwarded opencode argv:",
-              "  [\"run\",\"--file\",\"C:/tmp/uos-run-context.md\",\"--file\",\"" + join(projectDir, "Plans", "brief.md").replace(/\\/g, "\\\\") + "\",\"--agent\",\"orchestrator\",\"--continue\",\"continue from the attached brief\"]",
+              "  [\"run\",\"--file\",\"C:/tmp/uos-run-context.md\",\"--file\",\"" + join(projectDir, "Plans", "brief.md").replace(/\\/g, "\\\\") + "\",\"--agent\",\"ochestrator\",\"--continue\",\"continue from the attached brief\"]",
               "  UNITY_MCP_TOKEN: " + publicSecret,
               "  bridge token " + bridgeSecret,
             ].join("\n"),
@@ -7782,7 +7782,7 @@ describe("uos-core target selection helpers", () => {
       expect(result.entryDryRun.launchInputs.files).toEqual([briefPath]);
       expect(result.entryDryRun.opencodeArgs[0]).toBe("--prompt");
       expect(result.entryDryRun.opencodeArgs).toContain("--agent");
-      expect(result.entryDryRun.opencodeArgs).toContain("orchestrator");
+      expect(result.entryDryRun.opencodeArgs).toContain("ochestrator");
       expect(result.entryDryRun.opencodeArgs[1]).toContain("# UOS Startup");
       expect(result.entryDryRun.opencodeArgs[1]).toContain("get_uos_context");
       expect(result.entryDryRun.opencodeArgs[1]).toContain("read_planning_material");
@@ -8376,7 +8376,7 @@ describe("uos-core target selection helpers", () => {
           publicChatCalls.push({ command, args, cwd: options.cwd });
           return {
             status: 0,
-            stdout: `[uos] selected Unity project: ${args[3]}\n[uos] forwarded opencode argv:\n  [\"--prompt\",\"# UOS Startup\",\"--agent\",\"orchestrator\"]\n`,
+            stdout: `[uos] selected Unity project: ${args[3]}\n[uos] forwarded opencode argv:\n  [\"--prompt\",\"# UOS Startup\",\"--agent\",\"ochestrator\"]\n`,
             stderr: "",
           };
         },
@@ -8398,7 +8398,7 @@ describe("uos-core target selection helpers", () => {
           publicRunCalls.push({ command, args, cwd: options.cwd });
           return {
             status: 0,
-            stdout: `[uos] selected Unity project: ${args[2]}\n[uos] forwarded opencode argv:\n  [\"run\",\"--agent\",\"orchestrator\",\"--continue\",\"continue each selected project\"]\n`,
+            stdout: `[uos] selected Unity project: ${args[2]}\n[uos] forwarded opencode argv:\n  [\"run\",\"--agent\",\"ochestrator\",\"--continue\",\"continue each selected project\"]\n`,
             stderr: "",
           };
         },
@@ -8685,7 +8685,7 @@ function mvpPreflightSummaryFixture(projectPath = "D:/Unity/LiveProject") {
 function minimalOkResources() {
   return {
     config: { ok: true, path: "D:/UOS/opencode.json" },
-    defaultAgent: { ok: true, name: "orchestrator" },
+    defaultAgent: { ok: true, name: "ochestrator" },
     tools: { count: 48, missing: [] },
     plugins: [],
     autoPlugin: { ok: true, path: "D:/UOS/.opencode/plugins/uos.ts" },

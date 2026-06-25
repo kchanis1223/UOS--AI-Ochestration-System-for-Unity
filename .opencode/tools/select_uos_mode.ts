@@ -1,7 +1,7 @@
 /**
  * select_uos_mode - local orchestration helper.
  *
- * The Orchestrator uses this before internal submodel handoff work so mode
+ * The Ochestrator uses this before internal submodel handoff work so mode
  * choice is explicit, inspectable, and testable. This tool never mutates Unity.
  */
 import { tool } from "@opencode-ai/plugin";
@@ -11,9 +11,9 @@ import { listUosModes, selectUosMode } from "../../bin/mode-core.js";
 
 export default tool({
   description:
-    "Select the best UOS work mode for a user request without mutating Unity. Use this at the start of an Orchestrator turn to route work to kiosk, screen-from-material, scene-object, visual-repair, inspection, code-editor, or constrained general fallback methods.",
+    "Select the best UOS work mode for a user request without mutating Unity. Use this at the start of an Ochestrator turn to route work to kiosk, screen-from-material, scene-object, visual-repair, inspection, code-editor, or constrained general fallback methods.",
   args: {
-    request: z.string().describe("The user's current request or the Orchestrator's concise task brief."),
+    request: z.string().describe("The user's current request or the Ochestrator's concise task brief."),
     materialsDir: z
       .string()
       .optional()

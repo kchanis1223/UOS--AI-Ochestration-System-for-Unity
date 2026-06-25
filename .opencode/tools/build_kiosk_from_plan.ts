@@ -2,7 +2,7 @@
  * build_kiosk_from_plan - local handler tool (no Unity proxy).
  *
  * Converts a reviewed KioskPlan into an EditorChangeSet / EditorCommandBatch.
- * It does not mutate Unity; the Orchestrator should show the batch summary and
+ * It does not mutate Unity; the Ochestrator should show the batch summary and
  * pass the commands to the Editor execution boundary after approval.
  */
 import { tool } from "@opencode-ai/plugin";

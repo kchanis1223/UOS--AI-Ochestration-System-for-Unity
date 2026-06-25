@@ -67,7 +67,7 @@ describe("UOS mode registry", () => {
     });
     expect(selected.selectedMode.id).toBe("kiosk-content");
     expect(selected.confidence).toBe("high");
-    expect(selected.nextActions.join("\n")).toContain("Orchestrator-owned Task Packets");
+    expect(selected.nextActions.join("\n")).toContain("Ochestrator-owned Task Packets");
     expect(selected.nextActions.join("\n")).toContain("context and handoff overhead");
     expect(selected.nextActions.join("\n")).toContain("KioskStructurePlan and Main folder candidates");
     expect(selected.nextActions.join("\n")).toContain("FolderStructurePlan and MaterialPlacementPlan");

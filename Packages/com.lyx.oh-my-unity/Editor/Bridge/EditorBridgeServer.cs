@@ -91,6 +91,7 @@ namespace Lyx.OhMyUnity.Editor
         public static bool IsRunning => _running;
         public static int Port => _port;
         public static string Host => _host;
+        public static string Token => _expectedToken;
 
         public static int ConnectedClients
         {

@@ -1,6 +1,6 @@
 # UOS Internal Submodels
 
-Only `orchestrator` is a user-selectable opencode agent.
+Only `Ochestrator` is a user-selectable opencode agent.
 
 Files in this directory define internal functional submodels. A submodel is a
 capability contract: it owns one reusable method, its accepted inputs, expected
@@ -11,7 +11,7 @@ Domain-specific flows such as kiosk, FPS, arcade, XR, or exhibition content
 belong under `.opencode/recipes/` and compose one or more functional submodels.
 Recipes are specific content menus, not the common UOS production process.
 
-The common process is owned by the Orchestrator: understand materials and user
+The common process is owned by the Ochestrator: understand materials and user
 intent, reduce ambiguity, draft a `ProductionBlueprint`, get user approval,
 convert the approved blueprint into Plan/Build artifacts, apply Editor commands,
 and verify the result.
@@ -31,7 +31,7 @@ and verify the result.
 - `unity-inspection`: read selected project, bridge, screen, hierarchy, scene,
   and persisted UOS context without mutating Unity.
 - `general-editor`: constrained fallback executor for small approved Unity work
-  that has no dedicated submodel yet; it must not perform Orchestrator routing.
+  that has no dedicated submodel yet; it must not perform Ochestrator routing.
 
 ## Required Sections
 
@@ -47,13 +47,13 @@ Each submodel document must include:
 
 ## Normal Flow
 
-1. User talks to `orchestrator`.
-2. Orchestrator calls `get_uos_context`.
-3. Orchestrator calls `select_uos_mode`.
-4. Orchestrator selects functional submodel handoffs and optional recipes.
+1. User talks to `Ochestrator`.
+2. Ochestrator calls `get_uos_context`.
+3. Ochestrator calls `select_uos_mode`.
+4. Ochestrator selects functional submodel handoffs and optional recipes.
 5. Submodels return bounded evidence for material understanding, inspection,
    screen planning, code edits, or verification.
-6. Orchestrator drafts a `ProductionBlueprint` for broad creation work and
+6. Ochestrator drafts a `ProductionBlueprint` for broad creation work and
    reduces build-relevant ambiguity to 20 percent or less.
 7. User approves or revises the blueprint.
 8. Approved blueprint becomes mode-specific Plan/Build artifacts.

@@ -4,19 +4,19 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 // @ts-expect-error - shared pure-JS progress helpers (no type declarations).
 import {
-  createOrchestratorProgress,
-  formatOrchestratorProgress,
-  isActiveOrchestratorProgress,
-  readOrchestratorProgress,
-  summarizeOrchestratorProgress,
-  updateOrchestratorProgress,
-  validateOrchestratorProgress,
-  writeOrchestratorProgress,
-} from "../bin/orchestrator-progress-core.js";
+  createOchestratorProgress,
+  formatOchestratorProgress,
+  isActiveOchestratorProgress,
+  readOchestratorProgress,
+  summarizeOchestratorProgress,
+  updateOchestratorProgress,
+  validateOchestratorProgress,
+  writeOchestratorProgress,
+} from "../bin/ochestrator-progress-core.js";
 
-describe("UOS Orchestrator progress records", () => {
+describe("UOS Ochestrator progress records", () => {
   test("creates, validates, summarizes, and formats progress", () => {
-    const progress = createOrchestratorProgress({
+    const progress = createOchestratorProgress({
       id: "progress-kiosk",
       taskTitle: "Build kiosk",
       status: "building",
@@ -25,7 +25,7 @@ describe("UOS Orchestrator progress records", () => {
         id: "blueprint-kiosk",
         kind: "ProductionBlueprint",
         status: "approved",
-        path: "D:/Unity/MyGame/.uos/orchestrator/blueprints/blueprint-kiosk.json",
+        path: "D:/Unity/MyGame/.uos/ochestrator/blueprints/blueprint-kiosk.json",
       },
       plan: { id: "plan-kiosk", kind: "KioskPlan", status: "approved" },
       build: { id: "build-kiosk", kind: "EditorChangeSet", status: "pending" },
@@ -47,10 +47,10 @@ describe("UOS Orchestrator progress records", () => {
       nextAction: "Apply remaining Editor commands.",
     }, { now: "2026-06-11T00:00:00.000Z" });
 
-    expect(validateOrchestratorProgress(progress).ok).toBe(true);
-    expect(isActiveOrchestratorProgress(progress)).toBe(true);
+    expect(validateOchestratorProgress(progress).ok).toBe(true);
+    expect(isActiveOchestratorProgress(progress)).toBe(true);
 
-    const summary = summarizeOrchestratorProgress(progress);
+    const summary = summarizeOchestratorProgress(progress);
     expect(summary).toMatchObject({
       ok: true,
       status: "building",
@@ -66,8 +66,8 @@ describe("UOS Orchestrator progress records", () => {
       editorTotalCommands: 2,
     });
 
-    const formatted = formatOrchestratorProgress(progress);
-    expect(formatted).toContain("orchestratorProgress: building");
+    const formatted = formatOchestratorProgress(progress);
+    expect(formatted).toContain("ochestratorProgress: building");
     expect(formatted).toContain("mode=kiosk-content");
     expect(formatted).toContain("blueprint: ProductionBlueprint blueprint-kiosk status=approved");
     expect(formatted).toContain("current=build(in-progress)");
@@ -75,11 +75,11 @@ describe("UOS Orchestrator progress records", () => {
     expect(formatted).toContain("next: Apply remaining Editor commands.");
   });
 
-  test("persists progress under .uos/orchestrator/progress.json", async () => {
+  test("persists progress under .uos/ochestrator/progress.json", async () => {
     const dir = await mkdtemp(join(tmpdir(), "uos-progress-"));
     try {
       await mkdir(dir, { recursive: true });
-      const progress = createOrchestratorProgress({
+      const progress = createOchestratorProgress({
         id: "progress-persisted",
         taskTitle: "Resume me",
         status: "needs-approval",
@@ -89,10 +89,10 @@ describe("UOS Orchestrator progress records", () => {
         nextAction: "Wait for user approval.",
       }, { now: "2026-06-11T01:00:00.000Z" });
 
-      const file = await writeOrchestratorProgress(dir, progress);
-      expect(file.replace(/\\/g, "/")).toEndWith("/.uos/orchestrator/progress.json");
+      const file = await writeOchestratorProgress(dir, progress);
+      expect(file.replace(/\\/g, "/")).toEndWith("/.uos/ochestrator/progress.json");
 
-      const loaded = await readOrchestratorProgress(dir);
+      const loaded = await readOchestratorProgress(dir);
       expect(loaded).toMatchObject({
         id: "progress-persisted",
         status: "needs-approval",
@@ -101,7 +101,7 @@ describe("UOS Orchestrator progress records", () => {
         nextAction: "Wait for user approval.",
       });
 
-      const updated = updateOrchestratorProgress(loaded, {
+      const updated = updateOchestratorProgress(loaded, {
         status: "done",
         blueprint: { id: "blueprint-lobby", kind: "ProductionBlueprint", status: "approved" },
         steps: [{ id: "approve", title: "Approve plan", status: "done" }],
@@ -109,14 +109,14 @@ describe("UOS Orchestrator progress records", () => {
       expect(updated.status).toBe("done");
       expect(updated.blueprint.status).toBe("approved");
       expect(updated.updatedAt).toBe("2026-06-11T01:01:00.000Z");
-      expect(isActiveOrchestratorProgress(updated)).toBe(false);
+      expect(isActiveOchestratorProgress(updated)).toBe(false);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
   });
 
   test("rejects malformed progress records", () => {
-    const result = validateOrchestratorProgress({
+    const result = validateOchestratorProgress({
       version: "2.0.0",
       kind: "Other",
       id: "",
@@ -132,7 +132,7 @@ describe("UOS Orchestrator progress records", () => {
     });
     expect(result.ok).toBe(false);
     expect(result.errors).toContain('progress.version: must be "1.0.0"');
-    expect(result.errors).toContain('progress.kind: must be "OrchestratorProgress"');
+    expect(result.errors).toContain('progress.kind: must be "OchestratorProgress"');
     expect(result.errors).toContain('progress.steps[1].id: duplicate step id "dup"');
   });
 });

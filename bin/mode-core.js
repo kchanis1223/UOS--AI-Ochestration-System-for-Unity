@@ -157,7 +157,7 @@ export const UOS_MODES = [
     handoffFile: ".opencode/submodels/code-editor.md",
     planArtifact: "CodeEditPlan",
     buildArtifact: "CodeEditReport",
-    editorRole: "Apply explicit file/code edits after Orchestrator approval; do not mutate Unity through bridge tools.",
+    editorRole: "Apply explicit file/code edits after Ochestrator approval; do not mutate Unity through bridge tools.",
     primaryTools: [
       "get_uos_context",
       "rg",
@@ -184,7 +184,7 @@ export const UOS_MODES = [
     handoffFile: ".opencode/submodels/general-editor.md",
     planArtifact: "WorkPlan",
     buildArtifact: "EditorCommandBatch",
-    editorRole: "Apply only approved fallback commands after Orchestrator records why no specialist submodel owns the task.",
+    editorRole: "Apply only approved fallback commands after Ochestrator records why no specialist submodel owns the task.",
     primaryTools: [
       "get_uos_context",
       "get_project_info",
@@ -304,7 +304,7 @@ function nextActionsForMode(mode) {
   if (mode.id === "kiosk-content") {
     return [
       "Load selected Unity/project context.",
-      "Read the whole kiosk recipe and split the work into Orchestrator-owned Task Packets sized by context and handoff overhead.",
+      "Read the whole kiosk recipe and split the work into Ochestrator-owned Task Packets sized by context and handoff overhead.",
       "Run material-understanding with the relevant recipe slice to draft KioskStructurePlan and Main folder candidates.",
       "Review FolderStructurePlan and MaterialPlacementPlan before creating folders or placing materials.",
       "Produce or reuse KioskPlan from the approved Main folder structure.",

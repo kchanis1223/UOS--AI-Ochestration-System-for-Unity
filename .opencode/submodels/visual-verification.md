@@ -5,7 +5,7 @@
 Capture previews, compare generated screens against references, diagnose visual
 mismatch, and drive targeted repair loops.
 
-It is not a user-selectable opencode agent. The Orchestrator owns user
+It is not a user-selectable opencode agent. The Ochestrator owns user
 conversation, approval, and progress reporting.
 
 This submodel verifies Unity UI output. It may perform visual implementation
@@ -20,7 +20,7 @@ Non-goals:
 - rebuilding a whole screen without returning to `ui-screen-builder`,
 - editing scripts or project files,
 - changing non-UI GameObjects,
-- bypassing Orchestrator approval or the Editor boundary.
+- bypassing Ochestrator approval or the Editor boundary.
 
 ## Inputs
 
@@ -112,7 +112,7 @@ Additional routing guidance:
 - `close`: do not run automatic repair. Report evidence and ask for user polish
   direction only when needed.
 - `needs review`: prefer targeted element move/update/add/delete after
-  Orchestrator approval.
+  Ochestrator approval.
 - `different`: verify target/source selection first. If selection is correct,
   usually return to `ui-screen-builder` instead of doing local polish.
 - `aspectRatioDelta > 0.02`: check reference canvas, anchors, source selection,
@@ -147,7 +147,7 @@ Forbidden in this submodel:
 
 1. Load persisted preview/comparison context with `get_uos_context`.
 2. Resolve target screen and reference. If either is ambiguous, hand off to
-   `unity-inspection` or ask the Orchestrator for clarification.
+   `unity-inspection` or ask the Ochestrator for clarification.
 3. Capture or locate the latest preview.
 4. Compare preview against reference or inspect persisted feedback.
 5. Produce `VisualVerificationReport`.
@@ -157,7 +157,7 @@ Forbidden in this submodel:
    verification.
 9. Stop after at most 3 repair iterations per screen in MVP.
 10. If verdict is `different`, if aspect ratio is wrong, or if repair does not
-    improve, return to `ui-screen-builder` or Orchestrator instead of forcing
+    improve, return to `ui-screen-builder` or Ochestrator instead of forcing
     local edits.
 
 ## Approval Gates
@@ -165,7 +165,7 @@ Forbidden in this submodel:
 Request approval before broad replacement, deleting UI elements, changing many
 screens, or saving scenes.
 
-Always return to the Orchestrator for approval before:
+Always return to the Ochestrator for approval before:
 
 - applying any mutating repair command,
 - deleting UI elements,
@@ -187,7 +187,7 @@ improved the target.
 
 ## Failure Handling
 
-Stop and return a blocker to the Orchestrator when:
+Stop and return a blocker to the Ochestrator when:
 
 - selected Unity project context is missing or stale,
 - target screen cannot be resolved,

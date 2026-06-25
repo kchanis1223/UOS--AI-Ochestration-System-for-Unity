@@ -139,7 +139,7 @@ describe("UOS Plan/Build/Editor artifact contracts", () => {
       const written = await writeProductionBlueprint(projectDir, validBlueprint);
       expect(written.ok).toBe(true);
       expect(written.errors).toEqual([]);
-      expect(written.path?.replace(/\\/g, "/")).toEndWith("/.uos/orchestrator/blueprints/blueprint-kiosk-main.json");
+      expect(written.path?.replace(/\\/g, "/")).toEndWith("/.uos/ochestrator/blueprints/blueprint-kiosk-main.json");
 
       const raw = JSON.parse(await readFile(written.path!, "utf8"));
       expect(raw.kind).toBe("ProductionBlueprint");
@@ -374,16 +374,16 @@ describe("UOS Plan/Build/Editor artifact contracts", () => {
     expect(compliant.warnings).toEqual([]);
   });
 
-  test("classifies Editor tools and defines orchestrator persistence paths", () => {
+  test("classifies Editor tools and defines ochestrator persistence paths", () => {
     expect(editorToolKind("get_uos_context")).toBe("read");
     expect(editorToolKind("create_ui_screen")).toBe("write");
     expect(editorToolKind("some_future_tool")).toBe("unknown");
 
     const paths = uosArtifactPaths("D:/Unity/MyGame");
     expect(paths.contextDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos");
-    expect(paths.progressFile.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/orchestrator/progress.json");
-    expect(paths.blueprintsDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/orchestrator/blueprints");
-    expect(paths.plansDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/orchestrator/plans");
-    expect(paths.buildsDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/orchestrator/builds");
+    expect(paths.progressFile.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/ochestrator/progress.json");
+    expect(paths.blueprintsDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/ochestrator/blueprints");
+    expect(paths.plansDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/ochestrator/plans");
+    expect(paths.buildsDir.replace(/\\/g, "/")).toBe("D:/Unity/MyGame/.uos/ochestrator/builds");
   });
 });

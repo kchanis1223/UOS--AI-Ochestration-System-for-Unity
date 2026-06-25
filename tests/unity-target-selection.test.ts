@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdir, rm } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { listUnityProjects } from "../.opencode/tools/list_unity_projects.ts";
 import { selectUnityProject } from "../.opencode/tools/select_unity_project.ts";
@@ -89,5 +89,78 @@ describe("opencode Unity target selection", () => {
     expect(result.metadata.switched).toBe(false);
     expect(result.output).toContain("No selector was provided");
     expect(env.UOS_PROJECT_NAME).toBe("AlphaGame");
+  });
+
+  test("GUI connection file takes precedence and ignores stale session target state", async () => {
+    const dir = join(import.meta.dir, "..", ".omx", "tmp", "unity-target-gui-connection");
+    await rm(dir, { recursive: true, force: true });
+    await mkdir(join(dir, ".uos", "ochestrator"), { recursive: true });
+    await mkdir(join(dir, ".uos", "gui"), { recursive: true });
+    const staleStateFile = join(dir, ".uos", "ochestrator", "unity-target-session.json");
+    const connectionFile = join(dir, ".uos", "gui", "connection.json");
+    await writeFile(staleStateFile, JSON.stringify({
+      version: "1.0.0",
+      selectedAt: "2026-06-22T00:00:00.000Z",
+      source: "session",
+      target: alpha,
+    }, null, 2), "utf8");
+    await writeFile(connectionFile, JSON.stringify({
+      version: "1.0.0",
+      projectId: "gui-project",
+      projectPath: bravo.projectPath,
+      guiSessionId: "gui-1",
+      host: bravo.host,
+      port: bravo.port,
+      token: bravo.token,
+      status: "connected",
+      createdAt: "2026-06-22T00:00:00.000Z",
+      updatedAt: "2026-06-22T00:00:01.000Z",
+      lastVerifiedAt: "2026-06-22T00:00:02.000Z",
+      editorInstanceId: bravo.instanceId,
+    }, null, 2), "utf8");
+
+    try {
+      const active = await readActiveUnityTarget({
+        env: {
+          UOS_GUI_CONNECTION_FILE: connectionFile,
+          UOS_TARGET_SESSION_FILE: staleStateFile,
+          UNITY_MCP_HOST: alpha.host,
+          UNITY_MCP_PORT: String(alpha.port),
+          UNITY_MCP_TOKEN: alpha.token,
+        },
+        cwd: dir,
+      });
+      expect(active?.source).toBe("gui");
+      expect(active?.target.projectName).toBeUndefined();
+      expect(active?.target.projectPath).toBe(bravo.projectPath);
+      expect(active?.target.port).toBe(bravo.port);
+      expect(active?.target.token).toBe(bravo.token);
+
+      await writeFile(connectionFile, JSON.stringify({
+        version: "1.0.0",
+        projectId: "gui-project",
+        projectPath: bravo.projectPath,
+        guiSessionId: "gui-1",
+        host: bravo.host,
+        port: bravo.port,
+        token: bravo.token,
+        status: "waiting-bridge",
+        createdAt: "2026-06-22T00:00:00.000Z",
+        updatedAt: "2026-06-22T00:00:01.000Z",
+      }, null, 2), "utf8");
+      const inactive = await readActiveUnityTarget({
+        env: {
+          UOS_GUI_CONNECTION_FILE: connectionFile,
+          UOS_TARGET_SESSION_FILE: staleStateFile,
+          UNITY_MCP_HOST: alpha.host,
+          UNITY_MCP_PORT: String(alpha.port),
+          UNITY_MCP_TOKEN: alpha.token,
+        },
+        cwd: dir,
+      });
+      expect(inactive).toBeUndefined();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });

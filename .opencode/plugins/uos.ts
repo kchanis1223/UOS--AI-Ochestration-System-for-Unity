@@ -100,11 +100,49 @@ const UOS_PERMISSION_AUTO_ALLOW_TOOLS = new Set<string>([
   "draft_planning_intent_from_document",
   "draft_planning_intent_from_docx",
   "draft_planning_intent_from_pptx",
+  "draft_production_blueprint",
   "plan_kiosk_structure",
   "build_kiosk_from_plan",
 ]);
 
+const UOS_PERMISSION_MUTATING_TOOLS = new Set<string>([
+  "create_ui_screen",
+  "add_ui_element",
+  "add_ui_element_from_context",
+  "update_ui_element",
+  "update_ui_element_from_context",
+  "move_ui_element",
+  "move_ui_element_from_context",
+  "delete_ui_element",
+  "delete_ui_element_from_context",
+  "create_screen_transition",
+  "create_screen_transition_from_context",
+  "set_active_screen",
+  "set_active_screen_from_context",
+  "save_scene",
+  "import_asset",
+  "create_screen_from_material",
+  "create_image_reference_screen",
+  "create_document_screen",
+  "create_pptx_slide_screen",
+  "create_pptx_deck_screens",
+  "create_pdf_page_reference_screen",
+  "create_docx_image_reference_screen",
+  "create_reference_screen_from_material",
+  "create_scene_object",
+  "update_scene_object",
+  "update_scene_object_from_context",
+  "delete_scene_object",
+  "delete_scene_object_from_context",
+]);
+
+const UOS_PERMISSION_KNOWN_TOOLS = new Set<string>([
+  ...UOS_PERMISSION_AUTO_ALLOW_TOOLS,
+  ...UOS_PERMISSION_MUTATING_TOOLS,
+]);
+
 const INDEX_VERSION = "1.0.0";
+const GUI_APPROVAL_VERSION = "1.0.0";
 
 interface ElementRec {
   elementId: string;
@@ -1226,9 +1264,13 @@ function shouldRedactJournalField(key: string, value: unknown): boolean {
   return typeof value === "string" && value.length > 8192;
 }
 
-function shouldAutoAllowUosPermission(input: any): boolean {
+async function shouldAutoAllowUosPermission(input: any): Promise<boolean> {
   const toolName = permissionToolName(input);
-  return toolName !== undefined && UOS_PERMISSION_AUTO_ALLOW_TOOLS.has(toolName);
+  if (toolName === undefined) return false;
+  if (UOS_PERMISSION_AUTO_ALLOW_TOOLS.has(toolName)) return true;
+  if (envValue("UOS_GUI_MODE") !== "1") return false;
+  if (!UOS_PERMISSION_MUTATING_TOOLS.has(toolName)) return false;
+  return await hasValidGuiApproval();
 }
 
 function permissionToolName(input: any): string | undefined {
@@ -1241,12 +1283,31 @@ function permissionToolName(input: any): string | undefined {
   pushPermissionString(candidates, input?.tool?.tool);
   collectShallowPermissionMetadata(input?.metadata, candidates);
   for (const candidate of candidates) {
-    for (const toolName of UOS_PERMISSION_AUTO_ALLOW_TOOLS) {
+    for (const toolName of UOS_PERMISSION_KNOWN_TOOLS) {
       if (candidate === toolName) return toolName;
       if (candidate.includes(toolName)) return toolName;
     }
   }
   return undefined;
+}
+
+async function hasValidGuiApproval(): Promise<boolean> {
+  const approvalFile = envValue("UOS_GUI_APPROVAL_FILE");
+  if (approvalFile === undefined) return false;
+  try {
+    const approval = JSON.parse(await fs.readFile(approvalFile, "utf8")) as any;
+    if (approval?.version !== GUI_APPROVAL_VERSION) return false;
+    if (approval?.status !== "approved") return false;
+    const expiresAt = Date.parse(String(approval?.expiresAt ?? ""));
+    if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) return false;
+    const projectDir = envValue("UOS_PROJECT_DIR");
+    if (projectDir !== undefined && path.resolve(String(approval?.projectDir ?? "")) !== path.resolve(projectDir)) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function pushPermissionString(out: string[], value: unknown): void {
@@ -1276,7 +1337,7 @@ function collectShallowPermissionMetadata(value: unknown, out: string[]): void {
 const createUosJournalPlugin: Plugin = async () => {
   return {
     "permission.ask": async (input, output) => {
-      if (shouldAutoAllowUosPermission(input)) {
+      if (await shouldAutoAllowUosPermission(input)) {
         output.status = "allow";
       }
     },
@@ -1347,5 +1408,6 @@ export const UosJournalPlugin = Object.assign(createUosJournalPlugin, {
   emptyIndex,
   sanitizeJournalValue,
   shouldAutoAllowUosPermission,
+  hasValidGuiApproval,
   permissionToolName,
 });

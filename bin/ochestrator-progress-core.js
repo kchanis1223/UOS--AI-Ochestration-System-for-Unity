@@ -1,18 +1,18 @@
 /**
- * orchestrator-progress-core - persisted UOS Orchestrator progress records.
+ * ochestrator-progress-core - persisted UOS Ochestrator progress records.
  *
- * The progress file lives at <project>/.uos/orchestrator/progress.json and is
+ * The progress file lives at <project>/.uos/ochestrator/progress.json and is
  * intentionally independent from the existing screen/journal context. It lets a
- * resumed Orchestrator report mode, current step, evidence, blockers, and next
+ * resumed Ochestrator report mode, current step, evidence, blockers, and next
  * action without rereading the whole conversation.
  */
 
 import { promises as fs } from "node:fs";
 import { ARTIFACT_VERSION, uosArtifactPaths } from "./artifact-core.js";
 
-export const ORCHESTRATOR_PROGRESS_KIND = "OrchestratorProgress";
+export const OCHESTRATOR_PROGRESS_KIND = "OchestratorProgress";
 
-export const ORCHESTRATOR_PROGRESS_STATUSES = new Set([
+export const OCHESTRATOR_PROGRESS_STATUSES = new Set([
   "pending",
   "planning",
   "needs-approval",
@@ -23,7 +23,7 @@ export const ORCHESTRATOR_PROGRESS_STATUSES = new Set([
   "cancelled",
 ]);
 
-export const ORCHESTRATOR_STEP_STATUSES = new Set([
+export const OCHESTRATOR_STEP_STATUSES = new Set([
   "pending",
   "in-progress",
   "blocked",
@@ -31,12 +31,12 @@ export const ORCHESTRATOR_STEP_STATUSES = new Set([
   "skipped",
 ]);
 
-export function createOrchestratorProgress(input = {}, options = {}) {
+export function createOchestratorProgress(input = {}, options = {}) {
   const now = timestamp(options.now);
   const steps = normalizeSteps(input.steps);
   const progress = {
     version: ARTIFACT_VERSION,
-    kind: ORCHESTRATOR_PROGRESS_KIND,
+    kind: OCHESTRATOR_PROGRESS_KIND,
     id: nonBlank(input.id) ?? `uos-progress-${now.replace(/[^0-9]/g, "").slice(0, 14)}`,
     taskTitle: nonBlank(input.taskTitle) ?? "UOS task",
     status: normalizeStatus(input.status, "pending"),
@@ -55,19 +55,19 @@ export function createOrchestratorProgress(input = {}, options = {}) {
   return progress;
 }
 
-export function validateOrchestratorProgress(input) {
+export function validateOchestratorProgress(input) {
   const errors = [];
   const warnings = [];
   if (!isObject(input)) return invalid("progress", "must be an object");
 
   if (input.version !== ARTIFACT_VERSION) errors.push(`progress.version: must be "${ARTIFACT_VERSION}"`);
-  if (input.kind !== ORCHESTRATOR_PROGRESS_KIND) {
-    errors.push(`progress.kind: must be "${ORCHESTRATOR_PROGRESS_KIND}"`);
+  if (input.kind !== OCHESTRATOR_PROGRESS_KIND) {
+    errors.push(`progress.kind: must be "${OCHESTRATOR_PROGRESS_KIND}"`);
   }
   requireNonBlank(input.id, "progress.id", errors);
   requireNonBlank(input.taskTitle, "progress.taskTitle", errors);
-  if (!ORCHESTRATOR_PROGRESS_STATUSES.has(input.status)) {
-    errors.push(`progress.status: must be one of ${[...ORCHESTRATOR_PROGRESS_STATUSES].join(", ")}`);
+  if (!OCHESTRATOR_PROGRESS_STATUSES.has(input.status)) {
+    errors.push(`progress.status: must be one of ${[...OCHESTRATOR_PROGRESS_STATUSES].join(", ")}`);
   }
   if (!isObject(input.mode)) errors.push("progress.mode: must be an object");
   else requireNonBlank(input.mode.id, "progress.mode.id", errors);
@@ -88,8 +88,8 @@ export function validateOrchestratorProgress(input) {
       }
       requireNonBlank(step.id, `${path}.id`, errors);
       requireNonBlank(step.title, `${path}.title`, errors);
-      if (!ORCHESTRATOR_STEP_STATUSES.has(step.status)) {
-        errors.push(`${path}.status: must be one of ${[...ORCHESTRATOR_STEP_STATUSES].join(", ")}`);
+      if (!OCHESTRATOR_STEP_STATUSES.has(step.status)) {
+        errors.push(`${path}.status: must be one of ${[...OCHESTRATOR_STEP_STATUSES].join(", ")}`);
       }
       if (typeof step.id === "string") {
         if (ids.has(step.id)) errors.push(`${path}.id: duplicate step id "${step.id}"`);
@@ -107,8 +107,8 @@ export function validateOrchestratorProgress(input) {
   };
 }
 
-export function summarizeOrchestratorProgress(progress) {
-  const validation = validateOrchestratorProgress(progress);
+export function summarizeOchestratorProgress(progress) {
+  const validation = validateOchestratorProgress(progress);
   if (!validation.ok) {
     return {
       ok: false,
@@ -158,14 +158,14 @@ export function summarizeOrchestratorProgress(progress) {
   };
 }
 
-export function formatOrchestratorProgress(progress) {
-  const summary = summarizeOrchestratorProgress(progress);
+export function formatOchestratorProgress(progress) {
+  const summary = summarizeOchestratorProgress(progress);
   if (!summary.ok) {
-    return `[uos context] orchestratorProgress: invalid (${summary.errors.join("; ")})`;
+    return `[uos context] ochestratorProgress: invalid (${summary.errors.join("; ")})`;
   }
 
   const lines = [
-    `[uos context] orchestratorProgress: ${summary.status} task="${summary.taskTitle}" mode=${summary.modeId}`,
+    `[uos context] ochestratorProgress: ${summary.status} task="${summary.taskTitle}" mode=${summary.modeId}`,
     `  - progress: ${summary.completedSteps}/${summary.totalSteps} step(s) complete` +
       (summary.currentStep !== undefined
         ? `, current=${summary.currentStep.id}(${summary.currentStep.status})`
@@ -206,13 +206,13 @@ export function formatOrchestratorProgress(progress) {
   return lines.join("\n");
 }
 
-export function isActiveOrchestratorProgress(progress) {
-  return progress?.kind === ORCHESTRATOR_PROGRESS_KIND
+export function isActiveOchestratorProgress(progress) {
+  return progress?.kind === OCHESTRATOR_PROGRESS_KIND
     && progress.status !== "done"
     && progress.status !== "cancelled";
 }
 
-export async function readOrchestratorProgress(projectDir) {
+export async function readOchestratorProgress(projectDir) {
   const file = uosArtifactPaths(projectDir).progressFile;
   let parsed;
   try {
@@ -220,10 +220,10 @@ export async function readOrchestratorProgress(projectDir) {
   } catch {
     return undefined;
   }
-  const validation = validateOrchestratorProgress(parsed);
+  const validation = validateOchestratorProgress(parsed);
   return validation.ok ? parsed : {
     version: ARTIFACT_VERSION,
-    kind: ORCHESTRATOR_PROGRESS_KIND,
+    kind: OCHESTRATOR_PROGRESS_KIND,
     id: "invalid-progress",
     taskTitle: "Invalid persisted progress",
     status: "blocked",
@@ -232,24 +232,24 @@ export async function readOrchestratorProgress(projectDir) {
     steps: [],
     evidence: [],
     blockers: validation.errors.map((message, index) => ({ id: `invalid-${index + 1}`, message })),
-    nextAction: "Fix or remove .uos/orchestrator/progress.json.",
+    nextAction: "Fix or remove .uos/ochestrator/progress.json.",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 }
 
-export async function writeOrchestratorProgress(projectDir, progress) {
-  const validation = validateOrchestratorProgress(progress);
+export async function writeOchestratorProgress(projectDir, progress) {
+  const validation = validateOchestratorProgress(progress);
   if (!validation.ok) {
-    throw new Error(`orchestrator progress invalid: ${validation.errors.join("; ")}`);
+    throw new Error(`ochestrator progress invalid: ${validation.errors.join("; ")}`);
   }
   const paths = uosArtifactPaths(projectDir);
-  await fs.mkdir(paths.orchestratorDir, { recursive: true });
+  await fs.mkdir(paths.ochestratorDir, { recursive: true });
   await fs.writeFile(paths.progressFile, JSON.stringify(progress, null, 2), "utf8");
   return paths.progressFile;
 }
 
-export function updateOrchestratorProgress(progress, patch = {}, options = {}) {
+export function updateOchestratorProgress(progress, patch = {}, options = {}) {
   const next = {
     ...progress,
     ...patch,
@@ -270,7 +270,7 @@ export function updateOrchestratorProgress(progress, patch = {}, options = {}) {
 }
 
 function normalizeStatus(value, fallback) {
-  return ORCHESTRATOR_PROGRESS_STATUSES.has(value) ? value : fallback;
+  return OCHESTRATOR_PROGRESS_STATUSES.has(value) ? value : fallback;
 }
 
 function normalizeMode(value) {
@@ -305,7 +305,7 @@ function normalizeSteps(value) {
   return value.map((step, index) => ({
     id: nonBlank(step?.id) ?? `step-${index + 1}`,
     title: nonBlank(step?.title) ?? `Step ${index + 1}`,
-    status: ORCHESTRATOR_STEP_STATUSES.has(step?.status) ? step.status : "pending",
+    status: OCHESTRATOR_STEP_STATUSES.has(step?.status) ? step.status : "pending",
     evidenceIds: Array.isArray(step?.evidenceIds)
       ? step.evidenceIds.filter((item) => typeof item === "string" && item.length > 0)
       : [],

@@ -31,7 +31,7 @@ connect/disconnect, and enters the selected project with keyboard or mouse input
 - Selecting a project with no UOS package now automatically installs the UOS
   Unity package before opencode opens.
 - Added plain prompt fallback via `UOS_SIMPLE_PROJECT_SELECT=1`.
-- Added project-only opencode entry for disconnected projects. The Orchestrator
+- Added project-only opencode entry for disconnected projects. The Ochestrator
   startup prompt receives project status, UOS package status, and bridge-live
   status so it can avoid Unity mutation until connected.
 - Added `uninstallUnityPackage()` to remove UOS manifest dependency and embedded
@@ -45,7 +45,7 @@ connect/disconnect, and enters the selected project with keyboard or mouse input
 - `bin/uos-setup.js`
 - `tests/uos-core.test.ts`
 - `tests/uos-setup.test.ts`
-- `docs/uos-orchestrator-tasks.md`
+- `docs/uos-ochestrator-tasks.md`
 - `README.md`
 - `INSTALL.md`
 

@@ -1,4 +1,4 @@
-﻿import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "bun:test";
 import { mkdir, readFile, readlink, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -79,7 +79,7 @@ describe("uos setup", () => {
         },
       }), "utf8");
       await writeFile(join(repoRoot, "opencode.json"), JSON.stringify({
-        default_agent: "orchestrator",
+        default_agent: "ochestrator",
         agent: {
           build: { disable: true },
           plan: { disable: true },
@@ -117,7 +117,7 @@ describe("uos setup", () => {
       expect(JSON.parse(await readFile(`${paths.globalCfg}.bak-42`, "utf8"))).toEqual({ old: true });
       const config = JSON.parse(await readFile(paths.globalCfg, "utf8"));
       expect(config.plugin).toBeUndefined();
-      expect(config.default_agent).toBe("orchestrator");
+      expect(config.default_agent).toBe("ochestrator");
       expect(config.agent).toEqual({
         build: { disable: true },
         plan: { disable: true },
@@ -193,7 +193,7 @@ describe("uos setup", () => {
       await mkdir(join(repoRoot, ".opencode"), { recursive: true });
       await mkdir(unityRoot, { recursive: true });
       await writeFile(join(repoRoot, "opencode.json"), JSON.stringify({
-        default_agent: "orchestrator",
+        default_agent: "ochestrator",
       }), "utf8");
 
       const result = await runSetup({

@@ -20,15 +20,15 @@ for every recipe.
 
 ## User Boundary
 
-The user talks only to the UOS Orchestrator. Users must not be asked to choose a
-submodel. The Orchestrator selects the required submodel sequence, creates the
+The user talks only to the UOS Ochestrator. Users must not be asked to choose a
+submodel. The Ochestrator selects the required submodel sequence, creates the
 handoff, manages approval, and reports progress.
 
 ## Editor Boundary
 
 Submodels may plan, inspect, reason, and produce artifacts. Unity mutation must
 still pass through the Editor execution layer and Unity bridge tools, or through
-explicit code edits reviewed by the Orchestrator.
+explicit code edits reviewed by the Ochestrator.
 
 ## Common Production Pipeline
 
@@ -36,7 +36,7 @@ For broad content creation, UOS follows this recipe-agnostic pipeline:
 
 1. Resolve selected Unity project, source materials, and target scene/screen.
 2. Interpret planning materials and user intent through functional submodels.
-3. Reduce build-relevant ambiguity to 20 percent or less with Orchestrator-led
+3. Reduce build-relevant ambiguity to 20 percent or less with Ochestrator-led
    clarification loops.
 4. Draft a `ProductionBlueprint` that captures the user's intended experience
    before Unity mutation.
@@ -107,7 +107,7 @@ optional for modes without a selected recipe. Approved blueprints must have
 | `code-editor` | UOS must change Unity scripts/configuration when bridge commands are insufficient. |
 | `visual-verification` | UOS must compare requested output against references and drive repair loops. |
 | `unity-inspection` | UOS must safely inspect project state before mutation and during troubleshooting. |
-| `general-editor` | UOS needs a constrained fallback executor while new patterns are quarantined and promoted; routing remains Orchestrator-owned. |
+| `general-editor` | UOS needs a constrained fallback executor while new patterns are quarantined and promoted; routing remains Ochestrator-owned. |
 
 ## Standard Submodel Sections
 
@@ -147,11 +147,11 @@ Submodels should produce explicit artifacts instead of hidden reasoning:
 
 ## Fallback Boundary
 
-`general-editor` is not a fallback Orchestrator. It must not choose the
+`general-editor` is not a fallback Ochestrator. It must not choose the
 submodel sequence, reduce user ambiguity, or decide the next workflow. The
-Orchestrator owns routing, confirmation, approval, and progress reporting.
+Ochestrator owns routing, confirmation, approval, and progress reporting.
 
-Use `general-editor` only when the Orchestrator has checked the active
+Use `general-editor` only when the Ochestrator has checked the active
 specialist submodels and found no clear owner. Repeated fallback patterns must
 be reported as candidates for a new submodel or recipe instead of accumulating
 inside `general-editor`.
@@ -165,10 +165,10 @@ navigation patterns, content mapping, and quality bars, but it must not bypass
 the submodel contract, the `ProductionBlueprint` approval gate, or Editor
 boundary.
 
-The Orchestrator reads the whole selected recipe and decomposes it into Task
+The Ochestrator reads the whole selected recipe and decomposes it into Task
 Packets. A Task Packet is a bounded handoff unit sized by submodel ownership,
 context packet size, artifact boundary, approval boundary, ambiguity boundary,
 and handoff overhead. Submodels may read the recipe for context, but they
 execute only the recipe slice included in their handoff. They must not choose
 the global recipe workflow, decide the next submodel, or expand their task into
-filesystem or Unity mutation that the Orchestrator has not approved.
+filesystem or Unity mutation that the Ochestrator has not approved.

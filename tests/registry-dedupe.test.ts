@@ -26,6 +26,16 @@ describe("dedupeEditorsByProject", () => {
     expect(out[0].port).toBe(9000);
   });
 
+  test("prefers GUI-launched bridge entries over generic entries", () => {
+    const editors = [
+      { projectPath: P, port: 9000, uosPackageVersion: "0.1.0", updatedAtUtc: "2026-06-08T09:00:00.000Z" },
+      { projectPath: P, port: 9001, uosPackageVersion: "0.1.0", uosGuiSessionId: "gui-1", updatedAtUtc: "2026-06-08T01:00:00.000Z" },
+    ];
+    const out = dedupeEditorsByProject(editors);
+    expect(out).toHaveLength(1);
+    expect(out[0].port).toBe(9001);
+  });
+
   test("breaks ties by freshest updatedAtUtc when UOS version status is equal", () => {
     const editors = [
       { projectPath: P, port: 1, uosPackageVersion: "0.1.0", updatedAtUtc: "2026-06-08T01:00:00.000Z" },

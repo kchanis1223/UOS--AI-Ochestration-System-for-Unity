@@ -43,11 +43,11 @@ describe("UOS submodel contract", () => {
     expect(contract).toContain("Approved blueprints must have\n`ambiguity.estimate` at 20 or less");
     expect(contract).toContain("Users must not be asked to choose a\nsubmodel");
     expect(contract).toContain("Unity mutation must\nstill pass through the Editor execution layer");
-    expect(contract).toContain("`general-editor` is not a fallback Orchestrator");
-    expect(contract).toContain("routing remains Orchestrator-owned");
+    expect(contract).toContain("`general-editor` is not a fallback Ochestrator");
+    expect(contract).toContain("routing remains Ochestrator-owned");
     expect(contract).toContain("specific menu/workflow rule set");
     expect(contract).toContain("`ProductionBlueprint` approval gate");
-    expect(contract).toContain("The Orchestrator reads the whole selected recipe");
+    expect(contract).toContain("The Ochestrator reads the whole selected recipe");
     expect(contract).toContain("decomposes it into Task\nPackets");
     expect(contract).toContain("bounded handoff unit sized by submodel ownership");
     expect(contract).toContain("execute only the recipe slice included in their handoff");
@@ -192,7 +192,7 @@ describe("UOS submodel contract", () => {
     ]) {
       expect(doc).toContain(elementType);
     }
-    expect(doc).toContain("Always return to the Orchestrator for approval");
+    expect(doc).toContain("Always return to the Ochestrator for approval");
     expect(doc).toContain("PlanningIntent` validation fails");
     expect(doc).toContain("## Handoff Rules");
   });
@@ -234,7 +234,7 @@ describe("UOS submodel contract", () => {
       expect(doc).toContain(verdict);
     }
     expect(doc).toContain("at most 3 repair iterations per screen");
-    expect(doc).toContain("Always return to the Orchestrator for approval");
+    expect(doc).toContain("Always return to the Ochestrator for approval");
     expect(doc).toContain("Hand off to `ui-screen-builder`");
     expect(doc).toContain("Hand off to `material-understanding` only");
   });
@@ -261,7 +261,7 @@ describe("UOS submodel contract", () => {
       "\"inspection\": \"ready | warning | blocked | unknown\"",
       "\"editing\": \"ready | warning | blocked | unknown\"",
       "\"context\"",
-      "\"activeOrchestratorProgress\": false",
+      "\"activeOchestratorProgress\": false",
       "\"screens\": []",
       "\"hierarchy\"",
       "\"sceneObjects\": []",
@@ -324,7 +324,7 @@ describe("UOS submodel contract", () => {
     }
     expect(doc).toContain("Use direct `update_scene_object` and `delete_scene_object` only when the exact");
     expect(doc).toContain("Use context-based update/delete when the");
-    expect(doc).toContain("Always return to the Orchestrator for approval before");
+    expect(doc).toContain("Always return to the Ochestrator for approval before");
     expect(doc).toContain("deleting any object");
     expect(doc).toContain("saving a scene");
     expect(doc).toContain("using `latest` to resolve among multiple matching objects");
@@ -392,9 +392,9 @@ describe("UOS submodel contract", () => {
 
   test("general-editor records fallback executor boundary and promotion rules", async () => {
     const doc = await Bun.file(new URL("../.opencode/submodels/general-editor.md", import.meta.url)).text();
-    expect(doc).toContain("constrained fallback executor, not a fallback Orchestrator");
-    expect(doc).toContain("The Orchestrator owns user");
-    expect(doc).toContain("Use it only after the Orchestrator has checked");
+    expect(doc).toContain("constrained fallback executor, not a fallback Ochestrator");
+    expect(doc).toContain("The Ochestrator owns user");
+    expect(doc).toContain("Use it only after the Ochestrator has checked");
     for (const field of [
       "\"kind\": \"WorkPlan\"",
       "\"modeId\": \"general-editor\"",
@@ -418,9 +418,9 @@ describe("UOS submodel contract", () => {
     expect(doc).toContain("UI screen or UI element mutation tools");
     expect(doc).toContain("scene-object mutation tools");
     expect(doc).toContain("code/file edit tools");
-    expect(doc).toContain("Stop and return a blocker to the Orchestrator when");
+    expect(doc).toContain("Stop and return a blocker to the Ochestrator when");
     expect(doc).toContain("same fallback pattern appears repeatedly");
-    expect(doc).toContain("Return to the Orchestrator instead of routing directly");
+    expect(doc).toContain("Return to the Ochestrator instead of routing directly");
   });
 
   test("submodel definition plan marks general-editor as defined", async () => {
@@ -428,7 +428,7 @@ describe("UOS submodel contract", () => {
     expect(plan).toContain("| `general-editor` | Defined |");
     expect(plan).toContain("All seven active submodels are defined");
     expect(plan).toContain("Confirmed `FallbackExecutionReport` schema");
-    expect(plan).toContain("Orchestrator owns routing, ambiguity reduction, approval");
+    expect(plan).toContain("Ochestrator owns routing, ambiguity reduction, approval");
     expect(plan).toContain("Stop when any specialist submodel clearly owns the task");
     expect(plan).toContain("Recommend a new submodel or recipe when fallback work repeats");
   });

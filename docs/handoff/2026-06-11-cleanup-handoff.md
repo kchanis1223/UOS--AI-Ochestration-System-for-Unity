@@ -2,7 +2,7 @@
 
 ## Current Status
 
-- Original Orchestrator task groups: 9 / 9 complete.
+- Original Ochestrator task groups: 9 / 9 complete.
 - Launcher UX task groups: 6 / 6 complete.
 - Current phase: MVP-ready implementation cleanup complete; live user validation is next.
 - Production status: not complete until the launcher and Unity Editor bridge are validated against the user's real Unity project roots.
@@ -45,7 +45,7 @@
 - `c` installs/updates UOS package wiring for a project.
 - `d` disconnects UOS package wiring from a project.
 - Entering an uninstalled project now installs UOS automatically before opencode opens.
-- The launcher starts opencode with the Orchestrator agent for the selected Unity project.
+- The launcher starts opencode with the Ochestrator agent for the selected Unity project.
 
 ## Validation Next
 

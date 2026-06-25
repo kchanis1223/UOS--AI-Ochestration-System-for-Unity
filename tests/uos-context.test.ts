@@ -29,7 +29,7 @@ import { resolveContextSceneObject } from "../.opencode/tools/_scene_object_cont
 import getUosContextTool from "../.opencode/tools/get_uos_context.ts";
 import { writeActiveUnityTarget } from "../.opencode/tools/_unity_target_state.ts";
 // @ts-expect-error - shared pure-JS progress helpers (no type declarations).
-import { createOrchestratorProgress, writeOrchestratorProgress } from "../bin/orchestrator-progress-core.js";
+import { createOchestratorProgress, writeOchestratorProgress } from "../bin/ochestrator-progress-core.js";
 // @ts-expect-error - shared pure-JS blueprint persistence helpers (no type declarations).
 import { writeProductionBlueprint } from "../bin/production-blueprint-core.js";
 
@@ -528,7 +528,7 @@ describe("UOS persisted context", () => {
 
   test("reports invalid ProductionBlueprint artifacts as context blockers", async () => {
     const dir = join(import.meta.dir, "..", ".omx", "tmp", "uos-context-invalid-blueprints");
-    const blueprintsDir = join(dir, ".uos", "orchestrator", "blueprints");
+    const blueprintsDir = join(dir, ".uos", "ochestrator", "blueprints");
     await rm(dir, { recursive: true, force: true });
     await mkdir(blueprintsDir, { recursive: true });
 
@@ -558,13 +558,13 @@ describe("UOS persisted context", () => {
     }
   });
 
-  test("surfaces active orchestrator progress for resumed sessions", async () => {
-    const dir = join(import.meta.dir, "..", ".omx", "tmp", "uos-context-orchestrator-progress");
+  test("surfaces active ochestrator progress for resumed sessions", async () => {
+    const dir = join(import.meta.dir, "..", ".omx", "tmp", "uos-context-ochestrator-progress");
     await rm(dir, { recursive: true, force: true });
     await mkdir(dir, { recursive: true });
 
     try {
-      const progress = createOrchestratorProgress({
+      const progress = createOchestratorProgress({
         id: "progress-kiosk-resume",
         taskTitle: "장흥 키오스크 생성",
         status: "building",
@@ -588,18 +588,18 @@ describe("UOS persisted context", () => {
         evidence: [{ id: "ev-plan", title: "Plan approved" }],
         nextAction: "Continue applying EditorCommandBatch.",
       }, { now: "2026-06-11T02:00:00.000Z" });
-      await writeOrchestratorProgress(dir, progress);
+      await writeOchestratorProgress(dir, progress);
 
       const context = await loadUosContext({ projectDir: dir });
       expect(context.hasContext).toBe(true);
-      expect(context.activeOrchestratorProgress).toMatchObject({
+      expect(context.activeOchestratorProgress).toMatchObject({
         id: "progress-kiosk-resume",
         status: "building",
         mode: { id: "kiosk-content" },
       });
 
       const output = formatUosContext(context);
-      expect(output).toContain("orchestratorProgress: building");
+      expect(output).toContain("ochestratorProgress: building");
       expect(output).toContain("task=\"장흥 키오스크 생성\"");
       expect(output).toContain("mode=kiosk-content");
       expect(output).toContain("current=build(in-progress)");
@@ -608,11 +608,11 @@ describe("UOS persisted context", () => {
 
       const toolResult = await getUosContextTool.execute({ projectDir: dir }, { directory: "C:/WrongDirectory" });
       const metadata = toolResult.metadata as any;
-      expect(metadata.activeOrchestratorProgress).toMatchObject({
+      expect(metadata.activeOchestratorProgress).toMatchObject({
         id: "progress-kiosk-resume",
         status: "building",
       });
-      expect(toolResult.output).toContain("orchestratorProgress: building");
+      expect(toolResult.output).toContain("ochestratorProgress: building");
     } finally {
       await rm(dir, { recursive: true, force: true });
     }

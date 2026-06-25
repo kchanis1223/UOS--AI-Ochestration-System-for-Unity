@@ -1,10 +1,10 @@
-# UOS Orchestrator PRD
+# UOS Ochestrator PRD
 
 ## Purpose
 
 UOS should evolve from a kiosk-focused Unity automation workflow into a general
-Unity orchestration system. The user always talks to an Orchestrator. The
-Orchestrator understands intent, selects the right accumulated work method,
+Unity orchestration system. The user always talks to an Ochestrator. The
+Ochestrator understands intent, selects the right accumulated work method,
 uses internal submodel handoffs for planning/build/verification, applies
 approved changes through the Editor layer, and reports progress and results
 clearly.
@@ -30,7 +30,7 @@ generation.
 
 ## Goals
 
-1. Keep the user-facing conversation anchored on a single Orchestrator.
+1. Keep the user-facing conversation anchored on a single Ochestrator.
 2. Introduce explicit UOS modes that represent accumulated methods for different
    classes of Unity work.
 3. Separate `Plan`, `Build`, and `Editor` responsibilities.
@@ -38,7 +38,7 @@ generation.
 5. Keep Unity mutation behind a single Editor execution boundary.
 6. Make progress, mode choice, plan artifacts, build artifacts, and verification
    results visible and resumable.
-7. Support multiple connected Unity projects by letting the Orchestrator list
+7. Support multiple connected Unity projects by letting the Ochestrator list
    live projects and select the active edit target inside opencode.
 
 ## Non-Goals
@@ -52,7 +52,7 @@ generation.
 
 ```text
 User
-  <-> Orchestrator
+  <-> Ochestrator
         -> Mode registry / mode selector
         -> Internal submodel handoff / mode tools
         -> Plan artifacts
@@ -63,7 +63,7 @@ User
 
 ## Core Roles
 
-### Orchestrator
+### Ochestrator
 
 - Talks to the user.
 - Confirms or changes the active Unity project before editing when multiple
@@ -77,7 +77,7 @@ User
 
 ### Mode / Internal Submodel
 
-A mode routes one type of user work. It is selected by the Orchestrator and may
+A mode routes one type of user work. It is selected by the Ochestrator and may
 compose functional submodel handoffs plus an optional domain recipe. Neither
 modes nor submodels are user-selectable opencode agents. Initial modes:
 
@@ -90,7 +90,7 @@ modes nor submodels are user-selectable opencode agents. Initial modes:
 - `code-editor`: scripts, Editor scripts, asmdefs, packages, tests,
   diagnostics, and text project configuration.
 - `general-editor`: constrained fallback executor used only after the
-  Orchestrator confirms no specialist submodel owns the task.
+  Ochestrator confirms no specialist submodel owns the task.
 
 ### Plan
 
@@ -127,7 +127,7 @@ results.
 ### Unity Project Target
 
 UOS can have multiple live Unity Editor bridges. The launcher may select an
-initial target, but the Orchestrator can list connected projects and switch the
+initial target, but the Ochestrator can list connected projects and switch the
 session target before mutation. After a switch, context and bridge readiness
 must be reloaded for the selected project.
 
@@ -141,7 +141,7 @@ The user should be able to say:
 - "씬에 Cube와 조명을 배치해줘."
 - "현재 프로젝트 상태를 보고해줘."
 
-In each case the Orchestrator should:
+In each case the Ochestrator should:
 
 1. identify the likely mode,
 2. explain the selected mode when useful,
@@ -174,11 +174,11 @@ Implemented:
 
 - deterministic mode registry and selector in `bin/mode-core.js`
 - opencode tool `select_uos_mode`
-- single user-facing opencode agent at `.opencode/agents/orchestrator.md`
+- single user-facing opencode agent at `.opencode/agents/ochestrator.md`
 - internal submodel handoff docs under `.opencode/submodels/`
 - tests in `tests/uos-modes.test.ts`
-- architectural notes in `docs/uos-orchestrator-rework.md`
+- architectural notes in `docs/uos-ochestrator-rework.md`
 
 Next:
 
-- validate the Orchestrator-only UX in a live opencode session.
+- validate the Ochestrator-only UX in a live opencode session.

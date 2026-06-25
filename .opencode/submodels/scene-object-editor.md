@@ -5,7 +5,7 @@
 Create, inspect, update, or delete non-UI Unity scene GameObjects through UOS
 scene-object bridge tools.
 
-It is not a user-selectable opencode agent. The Orchestrator owns user
+It is not a user-selectable opencode agent. The Ochestrator owns user
 conversation, approval, target choice, and progress reporting.
 
 Use this submodel for simple spatial content and editor-visible objects:
@@ -28,7 +28,7 @@ Non-goals:
 - Selected project context from `get_uos_context`.
 - Optional `UnityInspectionReport` when project, bridge, hierarchy, or object
   identity was recently inspected.
-- User-confirmed scene-object intent from the Orchestrator.
+- User-confirmed scene-object intent from the Ochestrator.
 - Canonical `objectId` for follow-up edits when available.
 - Otherwise, one object selector: `objectName`, `objectNameContains`, `type`,
   `path`, `pathContains`, `query`, or `latest`.
@@ -54,7 +54,7 @@ Context freshness rules:
 - `EditorCommandBatch` for approved scene-object mutations.
 - Created, updated, deleted, or resolved object ids.
 - Verification readback from `list_scene_objects` or hierarchy inspection.
-- Save result when the Orchestrator approved `save_scene`.
+- Save result when the Ochestrator approved `save_scene`.
 
 ## SceneObjectPlan Artifact
 
@@ -117,7 +117,7 @@ Field meaning:
   action.
 - `selector`: the context selector used when no canonical `objectId` is known.
 - `requiresApproval`: whether this operation must return to the
-  Orchestrator/user before mutation.
+  Ochestrator/user before mutation.
 - `verification`: readback required after applying the Editor command batch.
 - `evidence`: context ids, bridge results, resolution candidates, and blockers.
 
@@ -172,11 +172,11 @@ Forbidden in this submodel:
    `get_scene_hierarchy_from_context`.
 9. Save only when explicitly approved.
 10. Return object ids, before/after summaries, and residual risk to the
-    Orchestrator.
+    Ochestrator.
 
 ## Approval Gates
 
-Always return to the Orchestrator for approval before:
+Always return to the Ochestrator for approval before:
 
 - deleting any object,
 - saving a scene,
@@ -207,7 +207,7 @@ secrets.
 
 ## Failure Handling
 
-Stop and return a blocker to the Orchestrator when:
+Stop and return a blocker to the Ochestrator when:
 
 - selected project context is missing or stale,
 - required scene-object bridge tools are unavailable,

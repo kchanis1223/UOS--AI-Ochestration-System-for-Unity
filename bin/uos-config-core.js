@@ -110,6 +110,18 @@ export async function writeUosConfig(config = {}, options = {}) {
     ...config,
     unityProjectRoots: normalizeUnityProjectRoots(config.unityProjectRoots ?? [], options),
   };
+  const defaultUnityExecutable = normalizeOptionalAbsolutePath(config.defaultUnityExecutable, options);
+  if (defaultUnityExecutable !== undefined) {
+    next.defaultUnityExecutable = defaultUnityExecutable;
+  } else {
+    delete next.defaultUnityExecutable;
+  }
+  const unityEditors = normalizeUnityEditorMap(config.unityEditors, options);
+  if (Object.keys(unityEditors).length > 0) {
+    next.unityEditors = unityEditors;
+  } else {
+    delete next.unityEditors;
+  }
   const responseLanguage = normalizeResponseLanguage(config.responseLanguage);
   if (responseLanguage !== undefined) {
     next.responseLanguage = responseLanguage;
@@ -146,6 +158,26 @@ export async function saveUnityProjectRoots(roots = [], options = {}) {
     ...current,
     unityProjectRoots: normalized,
   }, options);
+}
+
+export async function saveUnityExecutableConfig(input = {}, options = {}) {
+  const current = await readUosConfig(options);
+  const next = { ...current };
+  const defaultUnityExecutable = normalizeOptionalAbsolutePath(input.defaultUnityExecutable, options);
+  if (defaultUnityExecutable !== undefined) {
+    next.defaultUnityExecutable = defaultUnityExecutable;
+  }
+  const version = typeof input.version === "string" && input.version.trim().length > 0
+    ? input.version.trim()
+    : undefined;
+  const unityExecutable = normalizeOptionalAbsolutePath(input.unityExecutable, options);
+  if (version !== undefined && unityExecutable !== undefined) {
+    next.unityEditors = {
+      ...(current.unityEditors ?? {}),
+      [version]: unityExecutable,
+    };
+  }
+  return writeUosConfig(next, options);
 }
 
 export async function discoverConfiguredUnityProjects(options = {}) {
@@ -236,6 +268,23 @@ function dedupeUnityProjects(projects) {
 function boundedPositiveInt(value, fallback) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+function normalizeOptionalAbsolutePath(value, options = {}) {
+  if (typeof value !== "string" || value.trim().length === 0) return undefined;
+  const cwd = path.resolve(options.cwd ?? process.cwd());
+  return path.resolve(cwd, value.trim());
+}
+
+function normalizeUnityEditorMap(value, options = {}) {
+  if (value === undefined || value === null || typeof value !== "object" || Array.isArray(value)) return {};
+  const entries = {};
+  for (const [version, executable] of Object.entries(value)) {
+    if (typeof version !== "string" || version.trim().length === 0) continue;
+    const normalized = normalizeOptionalAbsolutePath(executable, options);
+    if (normalized !== undefined) entries[version.trim()] = normalized;
+  }
+  return entries;
 }
 
 function normalizeComparablePath(value) {

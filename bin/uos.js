@@ -127,6 +127,7 @@ import {
   waitForUnityTarget,
 } from "./uos-core.js";
 import { planKioskStructure, formatKioskPlanOutline, parseKioskPlanOptions } from "./kiosk-core.js";
+import { runUosGui } from "./uos-gui-server.js";
 
 const rawArgs = process.argv.slice(2);
 const args = normalizeUosEntryArgs(rawArgs);
@@ -135,6 +136,13 @@ const helpTopic = parseUosHelpTopic(rawArgs);
 
 if (helpTopic !== undefined) {
   console.log(formatUosHelp(helpTopic));
+} else if (shouldLaunchGui(rawArgs, process.env)) {
+  try {
+    await runUosGui(parseGuiOptions(rawArgs));
+  } catch (err) {
+    console.error("[uos gui] failed:", err instanceof Error ? err.stack ?? err.message : String(err));
+    process.exit(1);
+  }
 } else if (args[0] === "setup") {
   try {
     const { parseSetupOptions, runSetup } = await import("./uos-setup.js");
@@ -593,6 +601,42 @@ function shouldOpenUnityProjectCatalog(argv, env = process.env) {
   return Array.isArray(argv)
     && argv.length === 0
     && env.UOS_SKIP_PROJECT_CATALOG !== "1";
+}
+
+function shouldLaunchGui(argv, env = process.env) {
+  const first = argv[0];
+  if (first === "gui") return true;
+  return argv.length === 0 && env.UOS_DISABLE_GUI !== "1";
+}
+
+function parseGuiOptions(argv = []) {
+  const args = argv[0] === "gui" ? argv.slice(1) : argv;
+  const options = { repoRoot };
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    const eq = arg.indexOf("=");
+    const key = eq > 0 ? arg.slice(0, eq) : arg;
+    const value = eq > 0 ? arg.slice(eq + 1) : undefined;
+    if (key === "--no-open") {
+      options.open = false;
+      continue;
+    }
+    if (key === "--host") {
+      options.host = value ?? args[++i];
+      continue;
+    }
+    if (key === "--port") {
+      const raw = value ?? args[++i];
+      const port = Number.parseInt(String(raw ?? ""), 10);
+      if (!Number.isInteger(port) || port < 0 || port > 65535) {
+        throw new Error("[uos gui] --port requires 0..65535");
+      }
+      options.port = port;
+      continue;
+    }
+    throw new Error(`[uos gui] unknown option: ${arg}`);
+  }
+  return options;
 }
 
 async function promptUnityProjectCatalogSelection(options = {}) {

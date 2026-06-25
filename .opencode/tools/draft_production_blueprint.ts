@@ -12,7 +12,7 @@ import { writeProductionBlueprint } from "../../bin/production-blueprint-core.js
 
 export default tool({
   description:
-    "Validate and persist a ProductionBlueprint under .uos/orchestrator/blueprints for broad UOS creation work. This does not mutate Unity. Use after material interpretation and user confirmation, before Plan/Build artifacts.",
+    "Validate and persist a ProductionBlueprint under .uos/ochestrator/blueprints for broad UOS creation work. This does not mutate Unity. Use after material interpretation and user confirmation, before Plan/Build artifacts.",
   args: {
     projectDir: z
       .string()

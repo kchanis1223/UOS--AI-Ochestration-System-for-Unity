@@ -48,6 +48,7 @@ namespace Lyx.OhMyUnity.Editor
                     uosPackageVersion = info.uosPackageVersion,
                     protocolVersion = info.protocolVersion,
                     autoStartBridge = info.autoStartBridge,
+                    uosGuiSessionId = info.uosGuiSessionId,
                     processId = Process.GetCurrentProcess().Id,
                     updatedAtUtc = DateTime.UtcNow.ToString("o"),
                 };
@@ -104,6 +105,7 @@ namespace Lyx.OhMyUnity.Editor
             public string uosPackageVersion;
             public string protocolVersion;
             public bool autoStartBridge;
+            public string uosGuiSessionId;
             public int processId;
             public string updatedAtUtc;
         }

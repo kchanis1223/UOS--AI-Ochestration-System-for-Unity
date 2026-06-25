@@ -5,12 +5,12 @@
 Execute small, approved Unity Editor tasks that do not yet match a dedicated
 functional submodel.
 
-It is not a user-selectable opencode agent. The Orchestrator owns user
+It is not a user-selectable opencode agent. The Ochestrator owns user
 conversation, ambiguity reduction, routing, approval, next-submodel decisions,
 and progress reporting.
 
-This submodel is a constrained fallback executor, not a fallback Orchestrator.
-Use it only after the Orchestrator has checked the request against
+This submodel is a constrained fallback executor, not a fallback Ochestrator.
+Use it only after the Ochestrator has checked the request against
 `material-understanding`, `ui-screen-builder`, `scene-object-editor`,
 `code-editor`, `visual-verification`, and `unity-inspection` and found no clear
 owner.
@@ -34,9 +34,9 @@ Non-goals:
 
 ## Inputs
 
-- Orchestrator-confirmed task brief.
+- Ochestrator-confirmed task brief.
 - Selected project context from `get_uos_context`.
-- Explicit Orchestrator fallback decision explaining why no specialist submodel
+- Explicit Ochestrator fallback decision explaining why no specialist submodel
   applies.
 - Optional approved `WorkPlan` for multi-step fallback work.
 - Optional approved `EditorCommandBatch` when a bridge mutation is required.
@@ -136,7 +136,7 @@ Use this minimum artifact shape after fallback execution:
 Field meaning:
 
 - `fallback.reason`: why no active specialist submodel owns this task.
-- `excludedSubmodels`: explicit record that the Orchestrator checked the known
+- `excludedSubmodels`: explicit record that the Ochestrator checked the known
   specialist boundaries.
 - `promotionCandidate`: whether this fallback pattern should become a submodel
   or recipe if it repeats.
@@ -157,9 +157,9 @@ Read-only tools:
 
 Write tools:
 
-- `save_scene`, only when the Orchestrator explicitly approved a save and no
+- `save_scene`, only when the Ochestrator explicitly approved a save and no
   specialist submodel owns the surrounding task.
-- Future fallback bridge tools only when the Orchestrator provides an approved
+- Future fallback bridge tools only when the Ochestrator provides an approved
   `EditorCommandBatch` and the tool is not owned by an existing specialist
   submodel.
 
@@ -178,10 +178,10 @@ Forbidden in this submodel:
 ## Workflow
 
 1. Load selected project context with `get_uos_context`.
-2. Confirm the Orchestrator supplied a fallback reason and excluded specialist
+2. Confirm the Ochestrator supplied a fallback reason and excluded specialist
    submodels.
 3. If another submodel fits, stop and return that handoff recommendation to the
-   Orchestrator.
+   Ochestrator.
 4. Check bridge capabilities with `get_project_info` when a fallback bridge
    command is needed.
 5. Build or consume an approved `WorkPlan`.
@@ -192,7 +192,7 @@ Forbidden in this submodel:
 
 ## Approval Gates
 
-Always return to the Orchestrator for approval before:
+Always return to the Ochestrator for approval before:
 
 - any mutation,
 - saving a scene,
@@ -203,7 +203,7 @@ Always return to the Orchestrator for approval before:
 - any operation that may affect builds, packages, assets, scenes, prefabs,
   scripts, UI screens, scene objects, or visual output.
 
-No mutation may proceed from `general-editor` unless the Orchestrator has
+No mutation may proceed from `general-editor` unless the Ochestrator has
 already confirmed the target, fallback reason, approval source, and expected
 verification.
 
@@ -218,7 +218,7 @@ file contents, or long generated output.
 
 ## Failure Handling
 
-Stop and return a blocker to the Orchestrator when:
+Stop and return a blocker to the Ochestrator when:
 
 - fallback reason is missing,
 - any specialist submodel clearly owns the task,
@@ -230,13 +230,13 @@ Stop and return a blocker to the Orchestrator when:
 - readback cannot confirm the fallback change,
 - the same fallback pattern appears repeatedly.
 
-Retry only after concrete new input exists: Orchestrator fallback decision,
+Retry only after concrete new input exists: Ochestrator fallback decision,
 approved mutation, narrowed target, bridge capability evidence, or a decision
 to create/promote a new submodel or recipe.
 
 ## Handoff Rules
 
-Return to the Orchestrator instead of routing directly. Recommend:
+Return to the Ochestrator instead of routing directly. Recommend:
 
 - `material-understanding` for planning material interpretation,
 - `ui-screen-builder` for screens, UGUI elements, canvas layout, or transitions,

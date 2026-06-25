@@ -71,6 +71,13 @@ namespace Lyx.OhMyUnity.Editor
                 EditorGUILayout.LabelField("Server", state);
             }
             EditorGUILayout.LabelField("Connected clients", EditorBridgeServer.ConnectedClients.ToString());
+            string guiSessionId = BridgeSettings.GuiSessionId;
+            bool guiManaged = !string.IsNullOrEmpty(guiSessionId);
+            EditorGUILayout.LabelField("Control", guiManaged ? "GUI-managed bridge" : "Manual bridge");
+            if (guiManaged)
+            {
+                EditorGUILayout.LabelField("GUI session id", guiSessionId);
+            }
 
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -94,7 +101,7 @@ namespace Lyx.OhMyUnity.Editor
             EditorGUILayout.LabelField("Shared Token", EditorStyles.boldLabel);
             using (new EditorGUILayout.HorizontalScope())
             {
-                string token = BridgeSettings.Token;
+                string token = ActiveBridgeToken();
                 string shown = _showToken ? token : new string('*', Math.Min(token.Length, 24));
                 EditorGUILayout.SelectableLabel(shown, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
                 _showToken = GUILayout.Toggle(_showToken, "Show", EditorStyles.miniButton, GUILayout.Width(48f));
@@ -103,7 +110,7 @@ namespace Lyx.OhMyUnity.Editor
             {
                 if (GUILayout.Button("Copy Token"))
                 {
-                    EditorGUIUtility.systemCopyBuffer = BridgeSettings.Token;
+                    EditorGUIUtility.systemCopyBuffer = ActiveBridgeToken();
                 }
                 if (GUILayout.Button("Regenerate"))
                 {
@@ -123,7 +130,7 @@ namespace Lyx.OhMyUnity.Editor
         {
             EditorGUILayout.LabelField("UOS Launcher Snippet", EditorStyles.boldLabel);
             EditorGUILayout.LabelField(
-                "Use the local uos launcher from a terminal; explicit env is a fallback.",
+                "GUI Chat only uses a GUI-managed bridge. Explicit env is a CLI fallback.",
                 EditorStyles.miniLabel);
 
             string snippet = BuildUosLauncherSnippet();
@@ -188,7 +195,7 @@ namespace Lyx.OhMyUnity.Editor
         {
             string host = EditorBridgeServer.Host;
             int port = EditorBridgeServer.Port;
-            string token = BridgeSettings.Token;
+            string token = ActiveBridgeToken();
             ProjectInfoData info = BridgeProjectInfo.Create(host, port);
 
             var sb = new StringBuilder();
@@ -218,6 +225,11 @@ namespace Lyx.OhMyUnity.Editor
         private static string PowerShellQuote(string value)
         {
             return "'" + (value ?? string.Empty).Replace("'", "''") + "'";
+        }
+
+        private static string ActiveBridgeToken()
+        {
+            return EditorBridgeServer.IsRunning ? EditorBridgeServer.Token : BridgeSettings.Token;
         }
     }
 }

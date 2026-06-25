@@ -1,7 +1,7 @@
 /**
  * list_unity_projects - inspect live Unity Editor bridge targets.
  *
- * Read-only. The Orchestrator uses this when the user wants to choose or
+ * Read-only. The Ochestrator uses this when the user wants to choose or
  * confirm which connected Unity project should be edited.
  */
 import { tool } from "@opencode-ai/plugin";

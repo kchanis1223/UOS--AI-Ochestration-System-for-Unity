@@ -2,8 +2,8 @@ import { promises as fs } from "node:fs";
 import { basename, extname } from "node:path";
 import * as path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-// @ts-expect-error - shared pure-JS orchestrator progress helpers (no type declarations).
-import { formatOrchestratorProgress, readOrchestratorProgress } from "../../bin/orchestrator-progress-core.js";
+// @ts-expect-error - shared pure-JS ochestrator progress helpers (no type declarations).
+import { formatOchestratorProgress, readOchestratorProgress } from "../../bin/ochestrator-progress-core.js";
 // @ts-expect-error - shared pure-JS blueprint persistence helpers (no type declarations).
 import { summarizeProductionBlueprints } from "../../bin/production-blueprint-core.js";
 
@@ -277,7 +277,7 @@ export interface LoadedUosContext {
   projectDir: string;
   contextDir: string;
   hasContext: boolean;
-  activeOrchestratorProgress?: Record<string, unknown>;
+  activeOchestratorProgress?: Record<string, unknown>;
   productionBlueprints?: Record<string, unknown>;
   planningMaterialsDir?: string;
   attachedFiles: string[];
@@ -329,7 +329,7 @@ export async function loadUosContext(options: UosContextOptions): Promise<Loaded
   const sceneObjects = summarizeSceneObjects(screenIndex);
   const transitionCount = Array.isArray(screenIndex?.transitions) ? screenIndex.transitions.length : 0;
   const importedAssets = summarizeImportedAssets(screenIndex);
-  const activeOrchestratorProgress = await readOrchestratorProgress(projectDir);
+  const activeOchestratorProgress = await readOchestratorProgress(projectDir);
   const productionBlueprints = await summarizeProductionBlueprints(projectDir);
   const planningMaterialsDir = stringValue(options.planningMaterialsDir);
   const attachedFiles = normalizeAttachedFiles(options.attachedFiles);
@@ -350,9 +350,9 @@ export async function loadUosContext(options: UosContextOptions): Promise<Loaded
       || screens.length > 0
       || sceneObjects.length > 0
       || recentJournal.length > 0
-      || activeOrchestratorProgress !== undefined
+      || activeOchestratorProgress !== undefined
       || blueprintCount(productionBlueprints) > 0,
-    activeOrchestratorProgress,
+    activeOchestratorProgress,
     productionBlueprints,
     planningMaterialsDir,
     attachedFiles,
@@ -719,8 +719,8 @@ export function formatUosContext(context: LoadedUosContext): string {
   if (context.planningMaterialsDir !== undefined || context.attachedFiles.length > 0) {
     lines.push(...formatLaunchInputGuidance(context));
   }
-  if (context.activeOrchestratorProgress !== undefined) {
-    lines.push(formatOrchestratorProgress(context.activeOrchestratorProgress));
+  if (context.activeOchestratorProgress !== undefined) {
+    lines.push(formatOchestratorProgress(context.activeOchestratorProgress));
   }
   const blueprintSummary = formatProductionBlueprintContext(context.productionBlueprints);
   if (blueprintSummary !== undefined) {

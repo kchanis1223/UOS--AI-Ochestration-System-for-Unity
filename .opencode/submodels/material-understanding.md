@@ -21,12 +21,12 @@ Supported content-media input:
 Other text or data formats may be supported later or by existing tools, but
 they are not part of the MVP acceptance boundary for this submodel.
 
-It is not a user-selectable opencode agent. The Orchestrator owns user
+It is not a user-selectable opencode agent. The Ochestrator owns user
 conversation, target selection, approval, and progress reporting.
 
 ## Inputs
 
-- User task brief from the Orchestrator.
+- User task brief from the Ochestrator.
 - Selected Unity project context from `get_uos_context`.
 - Material paths, attached files, or `UNITY_MCP_MATERIALS_DIR`.
 - One or more MVP material inputs: image, PPTX, PDF, or DOCX.
@@ -90,7 +90,7 @@ Field meaning:
   behavior, or flow diagrams.
 - `assumptions`: interpretations that are plausible but not guaranteed.
 - `ambiguity`: estimated uncertainty from 0 to 100 and the drivers behind it.
-- `clarificationRequest`: Orchestrator-facing question, choices, and free-form
+- `clarificationRequest`: Ochestrator-facing question, choices, and free-form
   allowance when ambiguity remains above 20 percent.
 - `recommendedNextSubmodels`: next functional submodel sequence after user
   confirmation.
@@ -142,23 +142,23 @@ submodel.
 3. Classify each source as layout reference, content media, text requirement,
    data source, navigation hint, or unsupported input.
 4. Produce `MaterialUnderstanding` with confidence and unresolved questions.
-5. Hand the interpretation back to the Orchestrator for user confirmation before
+5. Hand the interpretation back to the Ochestrator for user confirmation before
    the next submodel proceeds.
-6. If ambiguity is above 20 percent, ask the Orchestrator to run a
+6. If ambiguity is above 20 percent, ask the Ochestrator to run a
    clarification loop with 2-3 choices and optional free-form input.
 7. Route to `ui-screen-builder`, `scene-object-editor`, `code-editor`, or
-   `general-editor` only after Orchestrator/user confirmation.
+   `general-editor` only after Ochestrator/user confirmation.
 
 ## Approval Gates
 
-Do not auto-progress directly to screen building or mutation. The Orchestrator
+Do not auto-progress directly to screen building or mutation. The Ochestrator
 must confirm the interpreted result with the user before the next stage.
 
-Ask the Orchestrator to request user approval before turning broad or ambiguous
+Ask the Ochestrator to request user approval before turning broad or ambiguous
 material interpretation into large screen creation, destructive replacement, or
 multi-scene changes.
 
-When ambiguity remains above 20 percent, the Orchestrator should re-ask with
+When ambiguity remains above 20 percent, the Ochestrator should re-ask with
 2-3 concrete choices. The user should be able to select a choice with
 arrow-key/Enter UI where available, or provide a free-form answer.
 
@@ -172,7 +172,7 @@ and the ambiguity estimate before and after the clarification loop.
 
 ## Failure Handling
 
-Stop and return a blocker to the Orchestrator when:
+Stop and return a blocker to the Ochestrator when:
 
 - no MVP-supported input can be read,
 - extraction fails for the requested image, PPTX, PDF, or DOCX,

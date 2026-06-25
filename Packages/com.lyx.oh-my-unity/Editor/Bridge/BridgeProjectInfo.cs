@@ -39,6 +39,7 @@ namespace Lyx.OhMyUnity.Editor
                 bridgePort = port,
                 autoStartBridge = BridgeSettings.AutoStart,
                 editorInstanceId = string.IsNullOrEmpty(instanceId) ? EditorBridgeRegistry.InstanceId : instanceId,
+                uosGuiSessionId = BridgeSettings.GuiSessionId,
                 supportedTools = supportedTools != null ? (string[])supportedTools.Clone() : Array.Empty<string>(),
                 writeTools = writeTools != null ? (string[])writeTools.Clone() : Array.Empty<string>(),
             };
@@ -58,6 +59,7 @@ namespace Lyx.OhMyUnity.Editor
         public int bridgePort;
         public bool autoStartBridge;
         public string editorInstanceId;
+        public string uosGuiSessionId;
         public string[] supportedTools;
         public string[] writeTools;
     }

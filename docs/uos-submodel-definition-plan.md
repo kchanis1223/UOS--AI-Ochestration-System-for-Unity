@@ -27,7 +27,7 @@ For each submodel, decide:
 - Outputs: artifact names and minimum schema.
 - Tools: allowed tools, forbidden tools, and read/write classification.
 - Workflow: normal step sequence.
-- Approval: operations that must return to Orchestrator/user before mutation.
+- Approval: operations that must return to Ochestrator/user before mutation.
 - Evidence: what must be persisted or reported after work.
 - Failure handling: when to stop, retry, ask, or hand off.
 - Handoff: next submodels or recipes this submodel may call into.
@@ -42,12 +42,12 @@ For each submodel, decide:
 | `unity-inspection` | Defined | UnityInspectionReport, target selection boundary, read/edit readiness, read-only workflow, failure handling, and handoff rules decided. |
 | `scene-object-editor` | Defined | SceneObjectPlan schema, supported object types, context resolution rules, mutation approval gates, failure handling, and handoff rules decided. |
 | `code-editor` | Defined | CodeEditPlan and CodeEditReport schemas, editable roots, validation rules, approval gates, failure handling, and handoff rules decided. |
-| `general-editor` | Defined | Fallback executor boundary, Orchestrator-owned routing, WorkPlan/FallbackExecutionReport schemas, approval gates, promotion rules, failure handling, and handoff recommendation rules decided. |
+| `general-editor` | Defined | Fallback executor boundary, Ochestrator-owned routing, WorkPlan/FallbackExecutionReport schemas, approval gates, promotion rules, failure handling, and handoff recommendation rules decided. |
 
 ## Current Decision
 
 All seven active submodels are defined. Next work should use these contracts to
-update Orchestrator behavior, implementation helpers, or live validation.
+update Ochestrator behavior, implementation helpers, or live validation.
 
 ## material-understanding Decisions
 
@@ -55,10 +55,10 @@ Confirmed:
 
 - MVP required inputs are image, PPTX, PDF, and DOCX.
 - The submodel does not auto-progress to the next stage.
-- The Orchestrator must confirm the interpreted result with the user before
+- The Ochestrator must confirm the interpreted result with the user before
   `ui-screen-builder` or any other next submodel proceeds.
 - Ambiguity must be reduced to 20 percent or less before proceeding.
-- If ambiguity is above 20 percent, the Orchestrator should run a re-question
+- If ambiguity is above 20 percent, the Ochestrator should run a re-question
   loop with 2-3 concrete choices plus optional free-form input.
 - Where available, choices should support arrow-key movement and Enter
   selection; free-form input remains available.
@@ -134,7 +134,7 @@ Confirmed:
 - `MaterialUnderstanding` does not need exhaustive pixel/element detail; it must
   provide enough confirmed meaning, classification, source references, and
   evidence for implementation-level conversion.
-- Input interpretation must be confirmed by the Orchestrator/user, with
+- Input interpretation must be confirmed by the Ochestrator/user, with
   ambiguity at or below 20 percent.
 - Screen building uses one of three build modes:
   - `editable`: UGUI element reconstruction.
@@ -237,7 +237,7 @@ Confirmed:
   `unavailable`.
 - MVP repair loops are limited to at most 3 iterations per screen.
 - `close` stops automatic repair and reports evidence.
-- `needs review` may produce targeted repair after Orchestrator approval.
+- `needs review` may produce targeted repair after Ochestrator approval.
 - `different` usually requires target/source verification or return to
   `ui-screen-builder`.
 - `aspectRatioDelta > 0.02` indicates canvas/source/build-mode investigation
@@ -364,7 +364,7 @@ Confirmed `UnityInspectionReport` schema:
     "activeScreenId": "",
     "screenCount": 0,
     "sceneObjectCount": 0,
-    "activeOrchestratorProgress": false
+    "activeOchestratorProgress": false
   },
   "screens": [],
   "hierarchy": {
@@ -383,7 +383,7 @@ Confirmed approval/choice gates:
 
 - No approval required for read-only inspection.
 - Explicit user choice required before ambiguous target switching.
-- If inspection turns into mutation, return to Orchestrator for mode selection
+- If inspection turns into mutation, return to Ochestrator for mode selection
   and mutation approval.
 
 Confirmed failure handling:
@@ -529,7 +529,7 @@ Confirmed:
   planning-material interpretation, or visual verification.
 - It must not directly mutate Unity scenes, prefabs, serialized binary assets,
   imported media, dependencies, or package installations without explicit
-  Orchestrator approval.
+  Ochestrator approval.
 - The editable root must be clear: selected Unity project, UOS package, UOS
   local tooling, or a user-approved mixed root.
 - Read relevant files and search existing patterns before editing.
@@ -656,10 +656,10 @@ Confirmed handoff rules:
 Confirmed:
 
 - `general-editor` is a constrained fallback executor, not a fallback
-  Orchestrator.
-- Orchestrator owns routing, ambiguity reduction, approval, next-submodel
+  Ochestrator.
+- Ochestrator owns routing, ambiguity reduction, approval, next-submodel
   decisions, and progress reporting.
-- `general-editor` may run only after Orchestrator checks
+- `general-editor` may run only after Ochestrator checks
   `material-understanding`, `ui-screen-builder`, `scene-object-editor`,
   `code-editor`, `visual-verification`, and `unity-inspection` and finds no
   clear owner.
@@ -763,7 +763,7 @@ Confirmed failure handling:
 
 Confirmed handoff recommendation rules:
 
-- Return to the Orchestrator instead of routing directly.
+- Return to the Ochestrator instead of routing directly.
 - Recommend `material-understanding` for planning material interpretation.
 - Recommend `ui-screen-builder` for screens, UGUI elements, canvas layout, or
   transitions.

@@ -74,7 +74,7 @@ describe("PlanningIntent preflight validation", () => {
     expect(prompt).toContain("material-to-screen specialist method");
     expect(prompt).toContain("not a user-selectable");
     expect(prompt).toContain("You are not the top-level");
-    expect(prompt).toContain("Orchestrator owns broad\ntask understanding");
+    expect(prompt).toContain("Ochestrator owns broad\ntask understanding");
     expect(prompt).toContain("submodel responsibility is narrower");
   });
 

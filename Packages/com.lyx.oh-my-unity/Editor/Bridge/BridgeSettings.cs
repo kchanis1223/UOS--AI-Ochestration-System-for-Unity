@@ -23,6 +23,10 @@ namespace Lyx.OhMyUnity.Editor
         private const string HostKey = "Lyx.UnityConvMcp.Host";
         private const string TokenKey = "Lyx.UnityConvMcp.Token";
         private const string AutoStartKey = "Lyx.UnityConvMcp.AutoStart";
+        private const string EnvHostKey = "UOS_BRIDGE_HOST";
+        private const string EnvPortKey = "UOS_BRIDGE_PORT";
+        private const string EnvTokenKey = "UOS_BRIDGE_TOKEN";
+        private const string EnvGuiSessionKey = "UOS_GUI_SESSION_ID";
 
         public static bool AutoStart
         {
@@ -32,7 +36,16 @@ namespace Lyx.OhMyUnity.Editor
 
         public static int Port
         {
-            get => EditorPrefs.GetInt(PortKey, DefaultPort);
+            get
+            {
+                string envPort = Environment.GetEnvironmentVariable(EnvPortKey);
+                if (!string.IsNullOrEmpty(envPort) && int.TryParse(envPort, out int parsed) && parsed >= 0)
+                {
+                    return parsed;
+                }
+
+                return EditorPrefs.GetInt(PortKey, DefaultPort);
+            }
             set => EditorPrefs.SetInt(PortKey, value);
         }
 
@@ -40,6 +53,9 @@ namespace Lyx.OhMyUnity.Editor
         {
             get
             {
+                string envHost = Environment.GetEnvironmentVariable(EnvHostKey);
+                if (!string.IsNullOrEmpty(envHost)) return envHost;
+
                 string host = EditorPrefs.GetString(HostKey, DefaultHost);
                 return string.IsNullOrEmpty(host) ? DefaultHost : host;
             }
@@ -54,6 +70,9 @@ namespace Lyx.OhMyUnity.Editor
         {
             get
             {
+                string envToken = Environment.GetEnvironmentVariable(EnvTokenKey);
+                if (!string.IsNullOrEmpty(envToken)) return envToken;
+
                 string token = EditorPrefs.GetString(TokenKey, string.Empty);
                 if (string.IsNullOrEmpty(token))
                 {
@@ -61,6 +80,15 @@ namespace Lyx.OhMyUnity.Editor
                     EditorPrefs.SetString(TokenKey, token);
                 }
                 return token;
+            }
+        }
+
+        public static string GuiSessionId
+        {
+            get
+            {
+                string value = Environment.GetEnvironmentVariable(EnvGuiSessionKey);
+                return string.IsNullOrEmpty(value) ? string.Empty : value;
             }
         }
 
