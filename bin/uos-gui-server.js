@@ -1295,7 +1295,7 @@ async function serveStatic(req, res, staticDir) {
   const requested = url.pathname === "/" ? "/index.html" : url.pathname;
   const resolved = path.resolve(staticDir, `.${requested}`);
   const root = path.resolve(staticDir);
-  const file = resolved.startsWith(root) && existsSync(resolved)
+  const file = (resolved === root || resolved.startsWith(root + path.sep)) && existsSync(resolved)
     ? resolved
     : path.join(root, "index.html");
   if (!existsSync(file)) {

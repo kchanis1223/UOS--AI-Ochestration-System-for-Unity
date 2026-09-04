@@ -98,6 +98,12 @@ import {
   waitForUnityTarget,
 } from "../bin/uos-core.js";
 
+// Platform-portable absolute fixture paths: Windows-style drive roots are not
+// absolute on POSIX, so fixtures build absolute paths per platform.
+const IS_WINDOWS = process.platform === "win32";
+const dabs = (p: string) => (IS_WINDOWS ? `D:/${p}` : `/${p}`);
+const cabs = (p: string) => (IS_WINDOWS ? `C:/${p}` : `/${p}`);
+
 function unityFileSpecifier(packagePath: string): string {
   return `file:${resolve(packagePath).replace(/\\/g, "/")}`;
 }
@@ -1673,16 +1679,16 @@ describe("uos-core target selection helpers", () => {
   });
 
   test("resolveSmokeImportPath resolves relative imports against material and project roots", () => {
-    expect(resolveSmokeImportPath("logo.png", { projectPath: "D:/Unity/Project" }, {}, {}))
-      .toBe(resolve("D:/Unity/Project", "logo.png"));
-    expect(resolveSmokeImportPath("logo.png", { projectPath: "D:/Unity/Project" }, {}, { UNITY_MCP_MATERIALS_DIR: "D:/Plans" }))
-      .toBe(resolve("D:/Plans", "logo.png"));
-    expect(resolveSmokeImportPath("logo.png", { projectPath: "D:/Unity/Project" }, { materialsDir: "D:/ExplicitPlans" }, {}))
-      .toBe(resolve("D:/ExplicitPlans", "logo.png"));
-    expect(resolveSmokeImportPath("logo.png", { projectPath: "D:/Unity/Project" }, { materialsDir: "Assets/Plans" }, {}))
-      .toBe(resolve("D:/Unity/Project", "Assets/Plans", "logo.png"));
-    expect(resolveSmokeImportPath("C:/absolute/logo.png", { projectPath: "D:/Unity/Project" }, {}, {}))
-      .toBe(resolve("C:/absolute/logo.png"));
+    expect(resolveSmokeImportPath("logo.png", { projectPath: dabs("Unity/Project") }, {}, {}))
+      .toBe(resolve(dabs("Unity/Project"), "logo.png"));
+    expect(resolveSmokeImportPath("logo.png", { projectPath: dabs("Unity/Project") }, {}, { UNITY_MCP_MATERIALS_DIR: dabs("Plans") }))
+      .toBe(resolve(dabs("Plans"), "logo.png"));
+    expect(resolveSmokeImportPath("logo.png", { projectPath: dabs("Unity/Project") }, { materialsDir: dabs("ExplicitPlans") }, {}))
+      .toBe(resolve(dabs("ExplicitPlans"), "logo.png"));
+    expect(resolveSmokeImportPath("logo.png", { projectPath: dabs("Unity/Project") }, { materialsDir: "Assets/Plans" }, {}))
+      .toBe(resolve(dabs("Unity/Project"), "Assets/Plans", "logo.png"));
+    expect(resolveSmokeImportPath(cabs("absolute/logo.png"), { projectPath: dabs("Unity/Project") }, {}, {}))
+      .toBe(resolve(cabs("absolute/logo.png")));
   });
 
   test("selectSmokeMaterialImage chooses the first image while skipping generated folders", async () => {
@@ -2071,66 +2077,66 @@ describe("uos-core target selection helpers", () => {
 
   test("buildTargetEnv preserves explicit launcher planning material root", () => {
     const env = buildTargetEnv({
-      projectPath: "D:/Unity/Chosen",
+      projectPath: dabs("Unity/Chosen"),
       host: "127.0.0.1",
       port: 19001,
-    }, { UNITY_MCP_MATERIALS_DIR: "D:/OldPlans" }, {
-      materialsDir: "D:/Plans",
+    }, { UNITY_MCP_MATERIALS_DIR: dabs("OldPlans") }, {
+      materialsDir: dabs("Plans"),
     });
 
-    expect(env.UNITY_MCP_MATERIALS_DIR).toBe(resolve("D:/Plans"));
+    expect(env.UNITY_MCP_MATERIALS_DIR).toBe(resolve(dabs("Plans")));
   });
 
   test("buildTargetEnv clears stale launcher-owned context attachments", () => {
     const env = buildTargetEnv({
-      projectPath: "D:/Unity/Chosen",
+      projectPath: dabs("Unity/Chosen"),
       host: "127.0.0.1",
       port: 19001,
     }, {
       UOS_CONTEXT_SUMMARY: "[uos context] projectName: PreviousGame",
-      UOS_ATTACHED_FILES: JSON.stringify(["D:/OldPlans/brief.pdf"]),
+      UOS_ATTACHED_FILES: JSON.stringify([dabs("OldPlans/brief.pdf")]),
     });
 
     expect(env.UOS_CONTEXT_SUMMARY).toBeUndefined();
     expect(env.UOS_ATTACHED_FILES).toBeUndefined();
 
     const attachedEnv = buildTargetEnv({
-      projectPath: "D:/Unity/Chosen",
+      projectPath: dabs("Unity/Chosen"),
       host: "127.0.0.1",
       port: 19001,
     }, {
-      UOS_ATTACHED_FILES: JSON.stringify(["D:/OldPlans/brief.pdf"]),
+      UOS_ATTACHED_FILES: JSON.stringify([dabs("OldPlans/brief.pdf")]),
     }, {
-      files: ["D:/NewPlans/mockup.png"],
+      files: [dabs("NewPlans/mockup.png")],
     });
-    expect(JSON.parse(attachedEnv.UOS_ATTACHED_FILES)).toEqual([resolve("D:/NewPlans/mockup.png")]);
+    expect(JSON.parse(attachedEnv.UOS_ATTACHED_FILES)).toEqual([resolve(dabs("NewPlans/mockup.png"))]);
   });
 
   test("buildTargetEnv injects launcher planning material root", () => {
-    expect(resolveLaunchMaterialsDir("Assets/Plans", { projectPath: "D:/Unity/Chosen" }, {}))
-      .toBe(resolve("D:/Unity/Chosen", "Assets/Plans"));
-    expect(resolveLaunchMaterialsDir("Assets/Plans", undefined, { env: { UOS_PROJECT_DIR: "D:/Unity/EnvProject" } }))
-      .toBe(resolve("D:/Unity/EnvProject", "Assets/Plans"));
+    expect(resolveLaunchMaterialsDir("Assets/Plans", { projectPath: dabs("Unity/Chosen") }, {}))
+      .toBe(resolve(dabs("Unity/Chosen"), "Assets/Plans"));
+    expect(resolveLaunchMaterialsDir("Assets/Plans", undefined, { env: { UOS_PROJECT_DIR: dabs("Unity/EnvProject") } }))
+      .toBe(resolve(dabs("Unity/EnvProject"), "Assets/Plans"));
     const env = buildTargetEnv({
-      projectPath: "D:/Unity/Chosen",
+      projectPath: dabs("Unity/Chosen"),
       host: "127.0.0.1",
       port: 19001,
-    }, { UNITY_MCP_MATERIALS_DIR: "D:/OldPlans" }, {
-      materialsDir: "D:/NewPlans",
+    }, { UNITY_MCP_MATERIALS_DIR: dabs("OldPlans") }, {
+      materialsDir: dabs("NewPlans"),
     });
 
-    expect(env.UNITY_MCP_MATERIALS_DIR).toBe(resolve("D:/NewPlans"));
+    expect(env.UNITY_MCP_MATERIALS_DIR).toBe(resolve(dabs("NewPlans")));
 
     const explicitBridgeEnv = buildTargetEnv(undefined, {
       UNITY_MCP_HOST: "127.0.0.1",
       UNITY_MCP_PORT: "17801",
       UNITY_MCP_TOKEN: "token",
-      UOS_PROJECT_DIR: "D:/Unity/EnvProject",
+      UOS_PROJECT_DIR: dabs("Unity/EnvProject"),
     }, {
       materialsDir: "Assets/Plans",
     });
     expect(explicitBridgeEnv.UNITY_MCP_MATERIALS_DIR)
-      .toBe(resolve("D:/Unity/EnvProject", "Assets/Plans"));
+      .toBe(resolve(dabs("Unity/EnvProject"), "Assets/Plans"));
   });
 
   test("buildTargetEnv injects launch material scan limits for tool defaults", () => {
@@ -2181,7 +2187,7 @@ describe("uos-core target selection helpers", () => {
   });
 
   test("buildForwardArgs injects UOS attachments for opencode run", () => {
-    const target = { projectPath: "D:/Unity/Chosen" };
+    const target = { projectPath: dabs("Unity/Chosen") };
     expect(shouldPrepareRunContextAttachment(["run", "make a menu"])).toBe(true);
     expect(shouldPrepareRunContextAttachment(["--print-logs", "run", "make a menu"])).toBe(true);
     expect(shouldPrepareRunContextAttachment(["run", "--help"])).toBe(false);
@@ -2207,20 +2213,20 @@ describe("uos-core target selection helpers", () => {
     expect(shouldPrintLaunchSummary(["run", "--help"])).toBe(false);
     expect(shouldPrintLaunchSummary(["--print-logs", "run", "-h"])).toBe(false);
 
-    expect(resolveLaunchFilePath("brief.md", target, { materialsDir: "D:/Plans" }))
-      .toBe(resolve("D:/Plans", "brief.md"));
-    expect(resolveLaunchFilePath("brief.md", undefined, { env: { UOS_PROJECT_DIR: "D:/Unity/EnvProject" } }))
-      .toBe(resolve("D:/Unity/EnvProject", "brief.md"));
+    expect(resolveLaunchFilePath("brief.md", target, { materialsDir: dabs("Plans") }))
+      .toBe(resolve(dabs("Plans"), "brief.md"));
+    expect(resolveLaunchFilePath("brief.md", undefined, { env: { UOS_PROJECT_DIR: dabs("Unity/EnvProject") } }))
+      .toBe(resolve(dabs("Unity/EnvProject"), "brief.md"));
     expect(buildForwardArgs(["run", "make a menu"], target, {
-      materialsDir: "D:/Plans",
+      materialsDir: dabs("Plans"),
       files: ["brief.md", "mockup.png"],
-      contextFiles: "C:/Temp/uos-run-context.md",
+      contextFiles: cabs("Temp/uos-run-context.md"),
     })).toEqual([
       "run",
       "--file",
-      "C:/Temp/uos-run-context.md",
+      cabs("Temp/uos-run-context.md"),
       "--file",
-      resolve("D:/Plans", "brief.md"),
+      resolve(dabs("Plans"), "brief.md"),
       "--agent",
       "ochestrator",
       "make a menu",
@@ -2230,34 +2236,34 @@ describe("uos-core target selection helpers", () => {
     })).toEqual([
       "run",
       "--file",
-      resolve("D:/Unity/Chosen", "brief.md"),
+      resolve(dabs("Unity/Chosen"), "brief.md"),
       "--agent",
       "ochestrator",
       "make a menu",
     ]);
     expect(buildForwardArgs(["--print-logs", "run", "make a menu"], target, {
       files: ["brief.md"],
-      contextFiles: "C:/Temp/uos-run-context.md",
+      contextFiles: cabs("Temp/uos-run-context.md"),
     })).toEqual([
       "--print-logs",
       "run",
       "--file",
-      "C:/Temp/uos-run-context.md",
+      cabs("Temp/uos-run-context.md"),
       "--file",
-      resolve("D:/Unity/Chosen", "brief.md"),
+      resolve(dabs("Unity/Chosen"), "brief.md"),
       "--agent",
       "ochestrator",
       "make a menu",
     ]);
     expect(buildForwardArgs(["run", "--continue", "make the title green"], target, {
       files: ["brief.md"],
-      contextFiles: "C:/Temp/uos-run-context.md",
+      contextFiles: cabs("Temp/uos-run-context.md"),
     })).toEqual([
       "run",
       "--file",
-      "C:/Temp/uos-run-context.md",
+      cabs("Temp/uos-run-context.md"),
       "--file",
-      resolve("D:/Unity/Chosen", "brief.md"),
+      resolve(dabs("Unity/Chosen"), "brief.md"),
       "--agent",
       "ochestrator",
       "--continue",
@@ -2265,17 +2271,17 @@ describe("uos-core target selection helpers", () => {
     ]);
     expect(buildForwardArgs(["run", "create from binary materials"], target, {
       files: ["brief.pdf", "mockup.png", "deck.pptx"],
-      contextFiles: "C:/Temp/uos-run-context.md",
+      contextFiles: cabs("Temp/uos-run-context.md"),
     })).toEqual([
       "run",
       "--file",
-      "C:/Temp/uos-run-context.md",
+      cabs("Temp/uos-run-context.md"),
       "--agent",
       "ochestrator",
       "create from binary materials",
     ]);
     const tuiArgs = buildForwardArgs([], target, {
-      materialsDir: "D:/Plans",
+      materialsDir: dabs("Plans"),
       files: ["brief.pdf"],
     });
     expect(tuiArgs[0]).toBe("--prompt");
@@ -2283,7 +2289,7 @@ describe("uos-core target selection helpers", () => {
     expect(tuiArgs[1]).toContain("get_uos_context");
     expect(tuiArgs[1]).toContain("select_uos_mode");
     expect(tuiArgs[1]).toContain("Selected Target");
-    expect(tuiArgs[1]).toContain(resolve("D:/Plans", "brief.pdf"));
+    expect(tuiArgs[1]).toContain(resolve(dabs("Plans"), "brief.pdf"));
     expect(tuiArgs[1]).toContain("read_planning_material");
     expect(tuiArgs[1]).toContain("## Recommended Starter Tasks");
     expect(tuiArgs[1]).toContain("## Example Prompts");
@@ -2302,7 +2308,7 @@ describe("uos-core target selection helpers", () => {
       env: launchEnv,
     });
     expect(tuiWithLaunchEnv[0]).toBe("--prompt");
-    expect(tuiWithLaunchEnv[1]).toContain("Planning material directory: D:/Unity/Chosen");
+    expect(tuiWithLaunchEnv[1]).toContain(`Planning material directory: ${dabs("Unity/Chosen")}`);
 
     const tuiWithResponseLanguage = buildForwardArgs([], target, {
       launchInputs: { files: [] },
@@ -2312,7 +2318,7 @@ describe("uos-core target selection helpers", () => {
     expect(tuiWithResponseLanguage[1]).toContain("Use Korean as the default response language");
 
     const tuiWithContextSummary = buildForwardArgs([], target, {
-      launchInputs: { materialsDir: "D:/Plans", files: ["deck.pptx"] },
+      launchInputs: { materialsDir: dabs("Plans"), files: ["deck.pptx"] },
       env: {
         UOS_CONTEXT_SUMMARY: "[uos context] projectName: Chosen\nscreen: MainScreen_ID Main",
         UOS_BRIDGE_SUPPORTED_TOOLS: JSON.stringify(["get_project_info", "create_ui_screen", "save_scene"]),
@@ -2330,16 +2336,16 @@ describe("uos-core target selection helpers", () => {
     expect(tuiWithContextSummary[1]).toContain("MainScreen_ID");
 
     const disconnectedCatalogTui = buildForwardArgs([], undefined, {
-      launchInputs: { materialsDir: "D:/Unity/Alpha", files: [] },
+      launchInputs: { materialsDir: dabs("Unity/Alpha"), files: [] },
       env: {
         UOS_PROJECT_NAME: "AlphaGame",
-        UOS_PROJECT_DIR: "D:/Unity/Alpha",
+        UOS_PROJECT_DIR: dabs("Unity/Alpha"),
         UOS_PROJECT_CATALOG_STATUS: "not-installed",
         UOS_PROJECT_UOS_INSTALLED: "0",
         UOS_PROJECT_BRIDGE_LIVE: "0",
       },
     });
-    expect(disconnectedCatalogTui[1]).toContain("Unity project: AlphaGame at D:/Unity/Alpha");
+    expect(disconnectedCatalogTui[1]).toContain(`Unity project: AlphaGame at ${dabs("Unity/Alpha")}`);
     expect(disconnectedCatalogTui[1]).toContain("UOS launcher project status: not-installed");
     expect(disconnectedCatalogTui[1]).toContain("UOS package installed: no");
     expect(disconnectedCatalogTui[1]).toContain("Unity Editor bridge live: no");
@@ -2411,10 +2417,10 @@ describe("uos-core target selection helpers", () => {
     ]);
 
     const env = buildTargetEnv(target, {}, {
-      materialsDir: "D:/Plans",
+      materialsDir: dabs("Plans"),
       files: ["brief.pdf"],
     });
-    expect(JSON.parse(env.UOS_ATTACHED_FILES)).toEqual([resolve("D:/Plans", "brief.pdf")]);
+    expect(JSON.parse(env.UOS_ATTACHED_FILES)).toEqual([resolve(dabs("Plans"), "brief.pdf")]);
   });
 
   test("buildEntryDryRun prepares interactive UOS startup for image, document, and PPTX materials", async () => {
@@ -3569,6 +3575,7 @@ describe("uos-core target selection helpers", () => {
         repoRoot,
         registryDir: registry,
         bridgeCapabilities: true,
+        platform: "win32",
         env: {
           UNITY_MCP_HOST: "127.0.0.1",
           UNITY_MCP_PORT: "17801",
@@ -3601,8 +3608,8 @@ describe("uos-core target selection helpers", () => {
       expect(output).toContain("[ok] tools: 58 entrypoint(s)");
       expect(output).not.toContain("[ok] plugin: opencode-claude-auth@latest");
       expect(output).toContain("[ok] local plugin:");
-      expect(output).toContain(".opencode\\plugins\\claude-auth.ts");
-      expect(output).toContain(".opencode\\plugins\\uos.ts");
+      expect(output).toContain(join(".opencode", "plugins", "claude-auth.ts"));
+      expect(output).toContain(join(".opencode", "plugins", "uos.ts"));
       expect(output).toContain("opencode runtime:");
       expect(output).toContain("[skipped] run `uos doctor --runtime`");
       expect(output).toContain("opencode CLI capabilities:");
@@ -3724,7 +3731,7 @@ describe("uos-core target selection helpers", () => {
   });
 
   test("inspectOpencodeRuntime reports resolved plugin duplicates and expired auth warnings", () => {
-    const repoRoot = "C:/Users/lyx/MCP_for_Unity_LYX";
+    const repoRoot = cabs("Users/lyx/uos-repo");
     const calls: string[][] = [];
     const runtime = inspectOpencodeRuntime(repoRoot, {
       runtimeTimeoutMs: 1000,
@@ -3737,7 +3744,7 @@ describe("uos-core target selection helpers", () => {
           plugin: [
             "opencode-claude-auth@latest",
             "file://./.opencode/plugins/uos.ts",
-            "file:///C:/Users/lyx/MCP_for_Unity_LYX/.opencode/plugins/uos.ts",
+            pathToFileURL(resolve(repoRoot, ".opencode", "plugins", "uos.ts")).href,
           ],
         }),
         stderr: "opencode-claude-auth: Claude credentials are expired and could not be refreshed. Run `claude` to re-authenticate.",
@@ -4323,7 +4330,7 @@ describe("uos-core target selection helpers", () => {
         screenName: "SmokeByTest",
         importPath: "Plans/logo.png",
         assetPath: "Assets/UOS/Imported/logo.png",
-        materialsDir: "D:/Materials",
+        materialsDir: dabs("Materials"),
         comparePath: "Plans/reference.png",
         compareOutputPath: "comparisons/diff.png",
         compareMaxWidth: 640,
@@ -4354,7 +4361,7 @@ describe("uos-core target selection helpers", () => {
 
       expect(result.projectInfo.projectName).toBe("LiveProject");
       expect(result.screensBefore.screens[0].name).toBe("Existing Screen");
-      expect(result.imported.sourcePath).toBe(resolve("D:/Materials", "Plans/logo.png"));
+      expect(result.imported.sourcePath).toBe(resolve(dabs("Materials"), "Plans/logo.png"));
       expect(result.imported.assetPath).toBe("Assets/UOS/Imported/logo.png");
       expect(result.created.screenId).toBe("SmokeByTest_ID");
       expect(result.created.elements).toHaveLength(7);
@@ -4390,7 +4397,7 @@ describe("uos-core target selection helpers", () => {
       expect(result.preview.path).toContain("SmokeByTest_ID");
       expect(result.preview.base64Data).toBe("[redacted base64Data, 12000 chars]");
       expect(result.comparison.verdict).toBe("close");
-      expect(result.comparison.referencePath).toBe(resolve("D:/Materials", "Plans/reference.png"));
+      expect(result.comparison.referencePath).toBe(resolve(dabs("Materials"), "Plans/reference.png"));
       expect(result.comparison.candidatePath).toBe(result.preview.path);
       expect(result.comparison.diffPath).toBe(join(projectDir, ".uos", "comparisons", "diff.png"));
       expect(result.saved.path).toBe("Assets/UOS_Generated.unity");
@@ -4542,7 +4549,7 @@ describe("uos-core target selection helpers", () => {
       expect(commandCall.args).toContain("-m");
       expect(commandCall.args).toContain("anthropic/claude-haiku-4-5");
       expect(commandCall.args.at(-1)).toContain("AI Smoke Object");
-      expect(commandCall.options.cwd).toContain("MCP_for_Unity_LYX");
+      expect(resolve(commandCall.options.cwd)).toBe(resolve(join(import.meta.dir, "..")));
       expect(commandCall.options.timeoutMs).toBe(180000);
       expect(commandCall.options.env.UNITY_MCP_HOST).toBe("127.0.0.1");
       expect(commandCall.options.env.UNITY_MCP_PORT).toBe(String(port));

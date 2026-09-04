@@ -10,8 +10,34 @@ injected into the environment. The older terminal TUI remains available through
 `uos chat` and `uos tui`.
 
 Status: alpha. The bridge, UGUI screen tools, local Editor discovery, and
-planning-material readers are implemented. End-to-end UX hardening is still in
-progress.
+planning-material readers are implemented. The Bun test suite (including a
+mocked end-to-end GUI server pipeline test) passes cross-platform on macOS,
+Linux, and Windows. End-to-end UX hardening against a live Unity Editor is
+still in progress.
+
+## Quickstart (macOS)
+
+```bash
+# 1. dependencies: node 22+, bun, opencode, and Unity 6 via Unity Hub
+brew install oven-sh/bun/bun
+npm install -g opencode-ai   # or: brew install sst/tap/opencode
+
+# 2. install repo dependencies (repo root and .opencode both)
+bun install
+(cd .opencode && npm install)
+
+# 3. expose the launcher and save your Unity projects folder
+npm link                     # provides the `uos` command
+uos setup --unity-projects ~/UnityProjects --language ko
+
+# 4. verify the environment, then open the browser workbench
+uos doctor
+uos gui
+```
+
+`uos doctor` must report `[ok]` for node, bun, and opencode before an AI
+session can start. opencode authentication (`opencode auth login`, or the
+bundled Claude OAuth plugin) is checked with `uos doctor --runtime`.
 
 ## Current Architecture
 
@@ -785,8 +811,13 @@ Unity EditMode verification on this machine:
   -logFile "C:\Users\lyx\MCP_for_Unity_LYX\TestResults\unity-current.log"
 ```
 
-The current local baseline is 208 Bun tests passing and 54 Unity EditMode tests
-passing.
+The current baseline is 359 Bun tests passing across 20 files (verified on
+Linux/macOS-style POSIX paths as well as Windows) and 54+ Unity EditMode tests
+passing. `tests/uos-gui-server.test.ts` covers the browser GUI backend
+end-to-end with a mocked Unity bridge and mocked opencode runner: project
+catalog connection state, session creation, chat routing, turn approval,
+bridge preflight, headless opencode argument construction, event streaming,
+and opencode session persistence.
 
 Live bridge E2E verification:
 

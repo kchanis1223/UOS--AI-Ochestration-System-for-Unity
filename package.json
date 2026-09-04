@@ -8,7 +8,7 @@
     "uos": "./bin/uos.js"
   },
   "scripts": {
-    "test": "bun test ./tests/bridge.test.ts ./tests/uos-core.test.ts ./tests/uos-gui-core.test.ts ./tests/materials.test.ts ./tests/uos-context.test.ts ./tests/uos-plugin-index.test.ts ./tests/opencode-tools-schema.test.ts ./tests/planning-intent.test.ts ./tests/ochestrator-agent.test.ts ./tests/submodel-contract.test.ts ./tests/uos-setup.test.ts ./tests/kiosk.test.ts ./tests/kiosk-build.test.ts ./tests/uos-modes.test.ts ./tests/uos-artifacts.test.ts ./tests/editor-batch.test.ts ./tests/ochestrator-progress.test.ts ./tests/registry-dedupe.test.ts ./tests/unity-target-selection.test.ts",
+    "test": "bun test ./tests/bridge.test.ts ./tests/uos-core.test.ts ./tests/uos-gui-core.test.ts ./tests/uos-gui-server.test.ts ./tests/materials.test.ts ./tests/uos-context.test.ts ./tests/uos-plugin-index.test.ts ./tests/opencode-tools-schema.test.ts ./tests/planning-intent.test.ts ./tests/ochestrator-agent.test.ts ./tests/submodel-contract.test.ts ./tests/uos-setup.test.ts ./tests/kiosk.test.ts ./tests/kiosk-build.test.ts ./tests/uos-modes.test.ts ./tests/uos-artifacts.test.ts ./tests/editor-batch.test.ts ./tests/ochestrator-progress.test.ts ./tests/registry-dedupe.test.ts ./tests/unity-target-selection.test.ts",
     "gui:build": "vite build gui",
     "test:bridge": "bun test ./tests/bridge.test.ts"
   },
